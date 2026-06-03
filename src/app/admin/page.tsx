@@ -152,7 +152,7 @@ export default async function DashboardPage() {
             ))}
             {lowStock.length + expiring.length === 0 ? (
               <p className="rounded-lg bg-[var(--cream)] p-4 text-sm text-[var(--cacao-light)]">
-                No hay alertas críticas por ahora. ✨
+                No hay alertas críticas por ahora.
               </p>
             ) : null}
           </div>
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
             ))}
             {planned.length === 0 ? (
               <p className="rounded-lg bg-[var(--cream)] p-4 text-sm text-[var(--cacao-light)]">
-                No hay lotes pendientes. 🎉
+                No hay lotes pendientes.
               </p>
             ) : null}
           </div>

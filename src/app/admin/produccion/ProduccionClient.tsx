@@ -251,18 +251,21 @@ export function ProduccionClient({
                     </table>
                   </div>
                   {hasInsufficientStock ? (
-                    <div className="mt-2 rounded-lg bg-[var(--danger-bg)] p-2 text-[0.65rem] font-semibold text-[var(--danger)] leading-relaxed">
-                      ⚠️ Stock insuficiente para algunos ingredientes del lote. Ajusta la cantidad de lotes o reabastece materias primas.
+                    <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-[var(--danger-bg)] p-2 text-[0.65rem] font-semibold text-[var(--danger)] leading-relaxed">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                      <span>Stock insuficiente para algunos ingredientes del lote. Ajusta la cantidad de lotes o reabastece materias primas.</span>
                     </div>
                   ) : (
-                    <div className="mt-2 rounded-lg bg-[var(--success-bg)] p-2 text-[0.65rem] font-semibold text-[var(--success)] leading-relaxed">
-                      ✨ Stock suficiente disponible para todos los ingredientes.
+                    <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-[var(--success-bg)] p-2 text-[0.65rem] font-semibold text-[var(--success)] leading-relaxed">
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                      <span>Stock suficiente disponible para todos los ingredientes.</span>
                     </div>
                   )}
                 </div>
               ) : selectedRecetaId ? (
-                <div className="mt-4 rounded-lg bg-amber-50 p-3 text-xs font-medium text-[#B7791F]">
-                  ⚠️ Esta receta no tiene ingredientes o insumos asociados en la base de datos.
+                <div className="mt-4 flex items-center gap-1.5 rounded-lg bg-amber-50 p-3 text-xs font-medium text-[#B7791F]">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-[#B7791F]" />
+                  <span>Esta receta no tiene ingredientes o insumos asociados en la base de datos.</span>
                 </div>
               ) : null}
 

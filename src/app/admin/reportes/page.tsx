@@ -93,7 +93,7 @@ export default async function ReportesPage() {
                 <StatusBadge label="Stock bajo" tone="warning" />
               </div>
             ))}
-            {lowStock.length === 0 ? <p className="rounded-lg bg-[var(--cream)] p-4 text-sm text-[var(--cacao-light)]">Sin riesgos de stock detectados. ✨</p> : null}
+            {lowStock.length === 0 ? <p className="rounded-lg bg-[var(--cream)] p-4 text-sm text-[var(--cacao-light)]">Sin riesgos de stock detectados.</p> : null}
           </div>
         </section>
       </div>
