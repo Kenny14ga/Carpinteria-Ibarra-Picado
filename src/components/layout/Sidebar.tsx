@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Boxes,
@@ -10,8 +10,10 @@ import {
   LayoutDashboard,
   Package,
   Settings,
-  Users
+  Users,
+  LogOut
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 type NavItem = {
   label: string;
@@ -51,6 +53,18 @@ function isActive(pathname: string, href: string) {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   return (
     <aside className="hidden min-h-screen w-[var(--sidebar-width)] flex-col border-r border-[var(--border-soft)] bg-white/80 backdrop-blur-xl lg:flex">
@@ -116,8 +130,8 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer badge */}
-      <div className="border-t border-[var(--border-soft)] p-3">
+      {/* Footer badge and logout */}
+      <div className="border-t border-[var(--border-soft)] p-3 space-y-2">
         <div className="rounded-lg bg-gradient-to-br from-[var(--cream)] to-[var(--brand-cream)]/40 p-3">
           <p className="text-[0.625rem] font-bold uppercase tracking-widest text-[var(--brand)]">
             Sistema
@@ -126,6 +140,14 @@ export function Sidebar() {
             Administración en línea
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-[0.8125rem] font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+        >
+          <LogOut className="h-[1.125rem] w-[1.125rem] shrink-0" />
+          <span>Cerrar Sesión</span>
+        </button>
       </div>
     </aside>
   );

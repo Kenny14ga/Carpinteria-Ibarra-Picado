@@ -43,7 +43,7 @@ export function MobileNav() {
       await supabase.auth.signOut();
       // Borrar cookie offline local si existe
       document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
-      router.push("/login");
+      router.push("/");
       router.refresh();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);

@@ -2,12 +2,27 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { db } from "@/lib/db";
 import { usePosStore } from "@/store/usePosStore";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartTicket } from "@/components/pos/CartTicket";
+import { supabase } from "@/lib/supabase";
 
 export default function PosDashboardPage() {
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
   // Simple live query to get active vitrina count for dashboard header
   const vitrinaCount = useLiveQuery(
     async () => {
@@ -28,13 +43,22 @@ export default function PosDashboardPage() {
       <header className="app-header px-4 py-4 sm:px-6 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link
                 href="/"
                 className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--brand)] hover:text-[var(--brand-dark)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded px-1 py-0.5"
               >
                 ← Volver al Panel
               </Link>
+              <span className="text-[var(--border-soft)]">|</span>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 rounded px-1 py-0.5"
+              >
+                <LogOut className="h-3 w-3" />
+                Cerrar Sesión
+              </button>
             </div>
             <h1 className="brand-heading mt-1 text-2xl font-black sm:text-3xl">Caja Táctil</h1>
           </div>
