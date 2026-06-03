@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PackagePlus, Wheat } from "lucide-react";
+import { PackagePlus, Wheat, ShoppingBag } from "lucide-react";
 import { AdminSection, StatusBadge } from "@/components/admin/AdminSection";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 
@@ -64,6 +64,10 @@ export function InventarioClient({ rows, error }: InventarioClientProps) {
       description="Tabla operativa para cantidades, proveedores, vencimientos y estados."
       action={
         <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/admin/compras" className="btn-secondary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold">
+            <ShoppingBag aria-hidden="true" className="h-4 w-4" />
+            Compras
+          </Link>
           <Link href="/admin/productos" className="btn-secondary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold">
             <PackagePlus aria-hidden="true" className="h-4 w-4" />
             Productos
