@@ -70,7 +70,7 @@ export async function loginAction(formData: FormData): Promise<LoginActionResult
     if (normalizedRole === "SUPERADMIN" || normalizedRole === "ADMIN") {
       redirectTo = "/admin";
     } else if (normalizedRole === "EMPLEADO" || normalizedRole === "VENDEDOR") {
-      redirectTo = "/pos/dashboard";
+      redirectTo = "/pos";
     } else {
       // Si el rol es CLIENTE o no tiene privilegios operativos, expulsamos
       await supabase.auth.signOut();

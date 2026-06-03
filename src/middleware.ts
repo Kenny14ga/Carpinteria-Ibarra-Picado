@@ -88,7 +88,7 @@ export async function middleware(request: NextRequest) {
           return NextResponse.redirect(new URL("/admin", request.url));
         }
         if (normalizedRole === "EMPLEADO" || normalizedRole === "VENDEDOR") {
-          return NextResponse.redirect(new URL("/pos/dashboard", request.url));
+          return NextResponse.redirect(new URL("/pos", request.url));
         }
       }
 
@@ -96,7 +96,7 @@ export async function middleware(request: NextRequest) {
       if (isAdminPath) {
         if (normalizedRole !== "SUPERADMIN" && normalizedRole !== "ADMIN") {
           if (normalizedRole === "EMPLEADO" || normalizedRole === "VENDEDOR") {
-            return NextResponse.redirect(new URL("/pos/dashboard", request.url));
+            return NextResponse.redirect(new URL("/pos", request.url));
           }
           return NextResponse.redirect(new URL("/login", request.url));
         }
@@ -144,7 +144,7 @@ export async function middleware(request: NextRequest) {
 
       // Si intenta ingresar a login estando logueado local/offline, lo enviamos al dashboard del POS
       if (isLoginPath) {
-        return NextResponse.redirect(new URL("/pos/dashboard", request.url));
+        return NextResponse.redirect(new URL("/pos", request.url));
       }
 
       return NextResponse.next();
