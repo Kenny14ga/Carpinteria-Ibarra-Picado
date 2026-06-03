@@ -87,9 +87,8 @@ function CategoriesPanel({
   return (
     <aside
       id="pos-categories-panel"
+      className="hidden md:flex flex-col"
       style={{
-        display: "flex",
-        flexDirection: "column",
         gap: "0.375rem",
         padding: "0.75rem 0.5rem",
         overflowY: "auto",
@@ -167,7 +166,13 @@ function CategoriesPanel({
 /* ═══════════════════════════════════════════════════════════════════════
    PANEL CENTRAL: Vitrina de productos (consume Dexie + Zustand addToCart)
    ═══════════════════════════════════════════════════════════════════════ */
-function VitrinaPanel({ categoriaActiva }: { categoriaActiva: string }) {
+function VitrinaPanel({
+  categoriaActiva,
+  setCategoriaActiva,
+}: {
+  categoriaActiva: string;
+  setCategoriaActiva: (id: string) => void;
+}) {
   const addToCart = usePosStore((s) => s.addToCart);
   const cartItems = usePosStore((s) => s.cart);
   const storeError = usePosStore((s) => s.error);
@@ -223,6 +228,8 @@ function VitrinaPanel({ categoriaActiva }: { categoriaActiva: string }) {
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        height: "100%",
+        width: "100%",
       }}
     >
       {/* Encabezado de la vitrina */}
@@ -300,6 +307,29 @@ function VitrinaPanel({ categoriaActiva }: { categoriaActiva: string }) {
           </svg>
           {itemCount} uds
         </div>
+      </div>
+
+      {/* Selector de Categorías Horizontal (Solo en Móvil) */}
+      <div className="flex md:hidden overflow-x-auto gap-2 px-4 py-2 border-b border-[var(--border-soft)] bg-white shrink-0 scrollbar-none">
+        {CATEGORIAS.map((cat) => {
+          const isActive = cat.id === categoriaActiva;
+          const Icon = cat.icon;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setCategoriaActiva(cat.id)}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap transition-all ${
+                isActive
+                  ? "border-[var(--brand)] bg-[var(--brand-cream)] text-[var(--brand-dark)] shadow-sm"
+                  : "border-[var(--border-soft)] bg-white text-[var(--cacao-muted)]"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{cat.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Error de stock del store */}
@@ -560,12 +590,14 @@ function TicketPanel() {
   return (
     <aside
       id="pos-ticket-panel"
+      className="border-l-0 md:border-l border-[var(--border-soft)]"
       style={{
         display: "flex",
         flexDirection: "column",
-        borderLeft: "1px solid var(--border-soft)",
         background: "white",
         overflow: "hidden",
+        height: "100%",
+        width: "100%",
       }}
     >
       {/* Cabecera del ticket */}
@@ -1056,23 +1088,58 @@ function TicketPanel() {
    ═══════════════════════════════════════════════════════════════════════ */
 export default function PosPage() {
   const [categoriaActiva, setCategoriaActiva] = useState("todos");
+  const [activeTab, setActiveTab] = useState<"productos" | "ticket">("productos");
+
+  const cartItems = usePosStore((s) => s.cart);
+  const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div
       id="pos-grid"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(5.5rem, 15%) 1fr minmax(16rem, 25%)",
-        height: "100%",
-        overflow: "hidden",
-      }}
+      className="md:grid md:grid-cols-[minmax(5.5rem,15%)_1fr_minmax(16rem,25%)] flex flex-col h-full w-full overflow-hidden pb-16 md:pb-0"
     >
       <CategoriesPanel
         categoriaActiva={categoriaActiva}
         onSelect={setCategoriaActiva}
       />
-      <VitrinaPanel categoriaActiva={categoriaActiva} />
-      <TicketPanel />
+      <div className={`${activeTab === "productos" ? "flex" : "hidden md:flex"} flex-col h-full overflow-hidden min-w-0 flex-1`}>
+        <VitrinaPanel 
+          categoriaActiva={categoriaActiva} 
+          setCategoriaActiva={setCategoriaActiva} 
+        />
+      </div>
+      <div className={`${activeTab === "ticket" ? "flex" : "hidden md:flex"} flex-col h-full overflow-hidden shrink-0`}>
+        <TicketPanel />
+      </div>
+
+      {/* Barra de Navegación Inferior (solo visible en Móviles) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[var(--border-soft)] h-16 flex items-center justify-around md:hidden px-4 shadow-[0_-4px_16px_rgba(74,43,50,0.06)]">
+        <button
+          type="button"
+          onClick={() => setActiveTab("productos")}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 text-xs font-bold transition ${
+            activeTab === "productos" ? "text-[var(--brand)]" : "text-[var(--cacao-muted)]"
+          }`}
+        >
+          <Store className="h-5 w-5" />
+          <span>Vitrina</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("ticket")}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 text-xs font-bold transition relative ${
+            activeTab === "ticket" ? "text-[var(--brand)]" : "text-[var(--cacao-muted)]"
+          }`}
+        >
+          <ReceiptText className="h-5 w-5" />
+          <span>Ticket</span>
+          {itemCount > 0 && (
+            <span className="absolute top-1 right-[25%] bg-[var(--brand)] text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white">
+              {itemCount}
+            </span>
+          )}
+        </button>
+      </nav>
     </div>
   );
 }

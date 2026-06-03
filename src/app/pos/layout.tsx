@@ -181,7 +181,7 @@ function TopBar() {
             <path d="M16 10a4 4 0 0 1-8 0" />
           </svg>
         </div>
-        <div style={{ minWidth: 0 }}>
+        <div className="hidden sm:block" style={{ minWidth: 0 }}>
           <p
             style={{
               fontSize: "0.65rem",
@@ -212,10 +212,10 @@ function TopBar() {
         </div>
       </div>
 
-      {/* Centro: Reloj + estado de conexión */}
+      {/* Centro: Reloj + estado de conexión (Oculto en móvil) */}
       <div
+        className="hidden sm:flex"
         style={{
-          display: "flex",
           alignItems: "center",
           gap: "1rem",
         }}
@@ -320,11 +320,11 @@ function TopBar() {
           type="button"
           disabled={isClosingShift}
           onClick={handleCloseShift}
+          className="py-2 px-2.5 sm:px-4"
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: "0.5rem",
-            padding: "0.6rem 1.25rem",
             borderRadius: "0.75rem",
             border: "1.5px solid var(--danger)",
             background: isClosingShift ? "var(--danger-bg)" : "transparent",
@@ -354,7 +354,9 @@ function TopBar() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" x2="9" y1="12" y2="12" />
           </svg>
-          {isClosingShift ? "Cerrando…" : "Cerrar Turno"}
+          <span className="hidden sm:inline">
+            {isClosingShift ? "Cerrando…" : "Cerrar Turno"}
+          </span>
         </button>
       </div>
 
