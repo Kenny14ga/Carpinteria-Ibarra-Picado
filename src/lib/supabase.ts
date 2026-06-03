@@ -148,6 +148,7 @@ export type RecetaRow = {
   rendimiento_unidades: number | null;
   costo_estimado: number | null;
   estado: string | null;
+  instrucciones: string | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -160,6 +161,7 @@ type RecetaInsert = {
   rendimiento_unidades?: number | null;
   costo_estimado?: number | null;
   estado?: string | null;
+  instrucciones?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
 };

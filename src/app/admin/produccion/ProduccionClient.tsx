@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition, useEffect, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, ChefHat, Plus, RefreshCw, Save, X } from "lucide-react";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 import { StatusBadge } from "@/components/admin/AdminSection";
@@ -57,7 +57,16 @@ export function ProduccionClient({
   error
 }: ProduccionClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const queryRecetaId = searchParams.get("recetaId");
+    if (queryRecetaId && recetas.some((r) => r.id === queryRecetaId)) {
+      setSelectedRecetaId(queryRecetaId);
+      setIsDrawerOpen(true);
+    }
+  }, [searchParams, recetas]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRecetaId, setSelectedRecetaId] = useState<string>("");
   const [lotes, setLotes] = useState<number>(1);

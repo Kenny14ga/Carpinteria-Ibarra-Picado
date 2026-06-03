@@ -32,14 +32,16 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
       throw new Error("El nombre de la receta es obligatorio.");
     }
 
+    const recipeId = crypto.randomUUID();
     const payload: RecetaInsert = {
-      id: crypto.randomUUID(),
+      id: recipeId,
       nombre,
       producto_id: readText(formData, "producto_id") || null,
       rendimiento: parseNumber(readText(formData, "rendimiento"), "El rendimiento"),
       rendimiento_unidades: parseNumber(readText(formData, "rendimiento"), "El rendimiento"),
       costo_estimado: parseNumber(readText(formData, "costo_estimado"), "El costo estimado"),
       estado: readText(formData, "estado") || "BORRADOR",
+      instrucciones: readText(formData, "instrucciones") || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -49,6 +51,33 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    // Insertar receta_insumos si se provee el json de ingredientes
+    const insumosJson = readText(formData, "insumos_json");
+    if (insumosJson) {
+      const insumos = JSON.parse(insumosJson) as Array<{
+        materia_prima_id: string;
+        cantidad_insumo: number;
+      }>;
+
+      const validInsumos = insumos.filter(
+        (ins) => ins.materia_prima_id.trim() !== "" && ins.cantidad_insumo > 0
+      );
+
+      if (validInsumos.length > 0) {
+        const insumosPayload = validInsumos.map((ins) => ({
+          id: crypto.randomUUID(),
+          receta_id: recipeId,
+          materia_prima_id: ins.materia_prima_id,
+          cantidad_insumo: ins.cantidad_insumo
+        }));
+
+        const { error: insumosError } = await supabase.from("receta_insumos").insert(insumosPayload);
+        if (insumosError) {
+          throw new Error(`Receta creada, pero falló al guardar ingredientes: ${insumosError.message}`);
+        }
+      }
     }
 
     revalidatePath("/recetas");
