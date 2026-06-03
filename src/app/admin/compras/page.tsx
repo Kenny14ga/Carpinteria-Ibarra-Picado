@@ -1,34 +1,52 @@
-import Link from "next/link";
-import { ShoppingBag, Truck } from "lucide-react";
-import { AdminSection, MetricCard, StatusBadge } from "@/components/admin/AdminSection";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import type { MateriaPrimaRow } from "@/lib/supabase";
+import { ComprasClient, type PurchaseRowWithDetails } from "./ComprasClient";
 
-export default function ComprasPage() {
+export const dynamic = "force-dynamic";
+
+async function loadComprasPageData() {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    // 1. Obtener el historial de compras con detalles e insumos
+    const { data: purchasesData, error: purchasesErr } = await supabase
+      .from("compras")
+      .select("*, compra_detalles(*, materias_primas(nombre, unidad_medida))")
+      .order("fecha_compra", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    // 2. Obtener catálogo de materias primas para el combobox
+    const { data: materialsData, error: materialsErr } = await supabase
+      .from("materias_primas")
+      .select("*")
+      .order("nombre", { ascending: true });
+
+    if (purchasesErr) throw purchasesErr;
+    if (materialsErr) throw materialsErr;
+
+    return {
+      purchases: (purchasesData || []) as PurchaseRowWithDetails[],
+      rawMaterials: (materialsData || []) as MateriaPrimaRow[],
+      error: null
+    };
+  } catch (err) {
+    console.error("[ComprasPage] Error al precargar datos:", err);
+    return {
+      purchases: [] as PurchaseRowWithDetails[],
+      rawMaterials: [] as MateriaPrimaRow[],
+      error: err instanceof Error ? err.message : "Error al consultar la base de datos de compras."
+    };
+  }
+}
+
+export default async function ComprasPage() {
+  const { purchases, rawMaterials, error } = await loadComprasPageData();
+
   return (
-    <AdminSection
-      eyebrow="Abastecimiento"
-      title="Compras"
-      description="Modulo preparado para registrar compras, recepcion de insumos y cuentas pendientes."
-      action={
-        <Link href="/admin/materias-primas" className="btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold">
-          <ShoppingBag aria-hidden="true" className="h-5 w-5" />
-          Registrar compra
-        </Link>
-      }
-    >
-      <div className="grid gap-3 sm:grid-cols-3">
-        <MetricCard label="Compras pendientes" value="0" tone="warning" icon={<ShoppingBag aria-hidden="true" className="h-5 w-5" />} />
-        <MetricCard label="Proveedores activos" value="0" tone="info" icon={<Truck aria-hidden="true" className="h-5 w-5" />} />
-        <MetricCard label="Recepciones de hoy" value="0" tone="success" icon={<ShoppingBag aria-hidden="true" className="h-5 w-5" />} />
-      </div>
-      <div className="surface-card mt-5 rounded-md p-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-[#4A2B32]">Flujo recomendado</h2>
-          <StatusBadge label="Preparado" tone="brand" />
-        </div>
-        <p className="mt-3 text-sm leading-6 text-[#6F4A52]">
-          La compra debe crear entrada de inventario, actualizar costo unitario y dejar historial para reportes.
-        </p>
-      </div>
-    </AdminSection>
+    <ComprasClient
+      purchases={purchases}
+      rawMaterials={rawMaterials}
+      initialError={error}
+    />
   );
 }
