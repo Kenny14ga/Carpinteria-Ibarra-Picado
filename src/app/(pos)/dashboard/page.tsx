@@ -8,15 +8,14 @@ import { db } from "@/lib/db";
 import { usePosStore } from "@/store/usePosStore";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartTicket } from "@/components/pos/CartTicket";
-import { supabase } from "@/lib/supabase";
+import { logoutAction } from "@/app/auth/actions";
 
 export default function PosDashboardPage() {
   const router = useRouter();
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
-      document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
+      await logoutAction();
       router.push("/");
       router.refresh();
     } catch (error) {

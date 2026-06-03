@@ -15,7 +15,7 @@ import {
   Users,
   X
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { logoutAction } from "@/app/auth/actions";
 
 const items = [
   { label: "Inicio", href: "/admin", icon: LayoutDashboard },
@@ -40,9 +40,7 @@ export function MobileNav() {
   const handleSignOut = async () => {
     try {
       setIsLoggingOut(true);
-      await supabase.auth.signOut();
-      // Borrar cookie offline local si existe
-      document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
+      await logoutAction();
       router.push("/");
       router.refresh();
     } catch (error) {

@@ -13,7 +13,7 @@ import {
   Users,
   LogOut
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { logoutAction } from "@/app/auth/actions";
 
 type NavItem = {
   label: string;
@@ -57,8 +57,7 @@ export function Sidebar() {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
-      document.cookie = "pos_offline_auth=expired; path=/; max-age=0";
+      await logoutAction();
       router.push("/");
       router.refresh();
     } catch (error) {
