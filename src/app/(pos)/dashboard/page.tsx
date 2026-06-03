@@ -43,23 +43,35 @@ export default function PosDashboardPage() {
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--brand)] hover:text-[var(--brand-dark)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded px-1 py-0.5"
-              >
-                ← Volver al Panel
-              </Link>
-              <span className="text-[var(--border-soft)]">|</span>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 rounded px-1 py-0.5"
-              >
-                <LogOut className="h-3 w-3" />
-                Cerrar Sesión
-              </button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/LOGOS/logo-mark.svg"
+                alt="Riquiquísimo"
+                className="h-12 w-12 shrink-0 rounded-lg shadow-sm"
+              />
+              <div>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--brand)] hover:text-[var(--brand-dark)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded px-1 py-0.5"
+                  >
+                    ← Volver al Panel
+                  </Link>
+                  <span className="text-[var(--border-soft)]">|</span>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 rounded px-1 py-0.5"
+                  >
+                    <LogOut className="h-3 w-3" />
+                    Cerrar Sesión
+                  </button>
+                </div>
+                <h1 className="brand-heading mt-1 text-xl font-black sm:text-2xl flex items-center gap-2">
+                  Caja Táctil <span className="hidden sm:inline text-xs font-bold uppercase text-[var(--brand)] tracking-widest">Riquiquísimo</span>
+                </h1>
+              </div>
             </div>
-            <h1 className="brand-heading mt-1 text-2xl font-black sm:text-3xl">Caja Táctil</h1>
           </div>
 
           {/* Quick Stats on Desktop Header */}

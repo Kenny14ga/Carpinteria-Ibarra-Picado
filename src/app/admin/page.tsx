@@ -58,9 +58,9 @@ export default async function DashboardPage() {
 
   return (
     <AdminSection
-      eyebrow="Riquiquísimo"
-      title="Dashboard"
-      description="Vista rápida de inventario, producción, recetas y costos."
+      eyebrow="¡Hola, Repostera! ✨"
+      title="Panel de Control"
+      description="¿Lista para la jornada de hoy? Revisa alertas de inventario, planifica tus lotes de producción y analiza los costos."
       action={
         <Link
           href="/admin/materias-primas"

@@ -252,9 +252,26 @@ export default function CatalogoPage() {
         <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#8B2E54]">Riquiquísimo</p>
-                <h1 className="brand-heading mt-1 truncate text-2xl font-semibold">Vitrina de hoy</h1>
+              <div className="flex items-center gap-3 min-w-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/LOGOS/logo-mark.svg"
+                  alt="Riquiquísimo"
+                  className="h-11 w-11 shrink-0 rounded-lg shadow-sm"
+                />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="brand-heading text-lg font-bold italic leading-none text-[#8B2E54]">
+                      Riquiquísimo
+                    </span>
+                    <span className="rounded-full bg-[#FDE1E6] px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-[#8B2E54]">
+                      Vitrina
+                    </span>
+                  </div>
+                  <h1 className="text-xs font-semibold text-[#6F4A52]/80 mt-1.5 italic">
+                    “Postres con cariño, sabor genuino”
+                  </h1>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {/* Botón del Carrito */}
