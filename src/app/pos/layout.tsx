@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { logoutAction } from "@/app/auth/actions";
+import { db } from "@/lib/db";
+import { Bell } from "lucide-react";
+import { PedidosPendientes } from "@/components/pos/PedidosPendientes";
 
 /* ─── TopBar: barra superior fija del POS ─── */
 function TopBar() {
@@ -12,6 +15,8 @@ function TopBar() {
   const [isOnline, setIsOnline] = useState(true);
   const [isClosingShift, setIsClosingShift] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
+  const [pendingCount, setPendingCount] = useState(0);
+  const [isPedidosOpen, setIsPedidosOpen] = useState(false);
 
   useEffect(() => {
     // Resolver el nombre del usuario desde Supabase Auth
@@ -58,15 +63,63 @@ function TopBar() {
     return () => clearInterval(timer);
   }, []);
 
+  // Suscripción al conteo de pedidos pendientes de WhatsApp
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const { count, error } = await (supabase.from("pedidos_clientes" as any) as any)
+          .select("*", { count: "exact", head: true })
+          .eq("estado", "ESPERANDO_WSP");
+        if (!error && count !== null) {
+          setPendingCount(count);
+        }
+      } catch (err) {
+        console.error("Error al consultar conteo de pedidos:", err);
+      }
+    };
+    fetchCount();
+
+    const channel = supabase
+      .channel("topbar_pedidos_count")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "pedidos_clientes" },
+        () => {
+          fetchCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
   const handleCloseShift = useCallback(async () => {
     if (isClosingShift) return;
-    const confirmed = window.confirm(
-      "¿Deseas cerrar tu turno y salir del sistema?"
-    );
-    if (!confirmed) return;
 
-    setIsClosingShift(true);
     try {
+      // Validar si hay elementos pendientes en la cola local de Dexie
+      const pendingSyncs = await db.sync_queue.toArray();
+      const pendingSyncCount = pendingSyncs.filter(
+        (item) => item.synced === false || item.estado === "PENDING"
+      ).length;
+
+      if (pendingSyncCount > 0) {
+        const confirmed = window.confirm(
+          `⚠️ Tienes ${pendingSyncCount} transacciones pendientes de sincronizar en este dispositivo.\n\n` +
+            "Si cierras tu turno ahora, las ventas se guardarán localmente en el navegador, pero no estarán reflejadas en el servidor hasta que vuelvas a iniciar sesión y te conectes a internet.\n\n" +
+            "¿Deseas cerrar tu turno de todos modos?"
+        );
+        if (!confirmed) return;
+      } else {
+        const confirmed = window.confirm(
+          "¿Deseas cerrar tu turno y salir del sistema?"
+        );
+        if (!confirmed) return;
+      }
+
+      setIsClosingShift(true);
       await logoutAction();
       router.push("/login");
       router.refresh();
@@ -212,48 +265,104 @@ function TopBar() {
         </div>
       </div>
 
-      {/* Derecha: Botón Cerrar Turno */}
-      <button
-        id="pos-close-shift-btn"
-        type="button"
-        disabled={isClosingShift}
-        onClick={handleCloseShift}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          padding: "0.6rem 1.25rem",
-          borderRadius: "0.75rem",
-          border: "1.5px solid var(--danger)",
-          background: isClosingShift ? "var(--danger-bg)" : "transparent",
-          color: "var(--danger)",
-          fontSize: "0.75rem",
-          fontWeight: 800,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          cursor: isClosingShift ? "not-allowed" : "pointer",
-          opacity: isClosingShift ? 0.5 : 1,
-          transition: "all 0.2s ease",
-          WebkitTapHighlightColor: "transparent",
-          flexShrink: 0,
-        }}
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* Derecha: Notificaciones + Botón Cerrar Turno */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
+        {/* Campana de Pedidos Pendientes */}
+        <button
+          id="pos-pedidos-bell-btn"
+          type="button"
+          onClick={() => setIsPedidosOpen(true)}
+          style={{
+            position: "relative",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "2.5rem",
+            height: "2.5rem",
+            borderRadius: "0.75rem",
+            border: "1.5px solid var(--border-soft)",
+            background: "transparent",
+            color: "var(--cacao)",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            WebkitTapHighlightColor: "transparent",
+          }}
+          title="Pedidos pendientes de WhatsApp"
         >
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" x2="9" y1="12" y2="12" />
-        </svg>
-        {isClosingShift ? "Cerrando…" : "Cerrar Turno"}
-      </button>
+          <Bell className="h-5 w-5" />
+          {pendingCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-0.25rem",
+                right: "-0.25rem",
+                background: "var(--danger)",
+                color: "white",
+                fontSize: "0.65rem",
+                fontWeight: 900,
+                minWidth: "1.25rem",
+                height: "1.25rem",
+                padding: "0 0.25rem",
+                borderRadius: "9999px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 6px rgba(220, 38, 38, 0.35)",
+              }}
+            >
+              {pendingCount}
+            </span>
+          )}
+        </button>
+
+        <button
+          id="pos-close-shift-btn"
+          type="button"
+          disabled={isClosingShift}
+          onClick={handleCloseShift}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.6rem 1.25rem",
+            borderRadius: "0.75rem",
+            border: "1.5px solid var(--danger)",
+            background: isClosingShift ? "var(--danger-bg)" : "transparent",
+            color: "var(--danger)",
+            fontSize: "0.75rem",
+            fontWeight: 800,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            cursor: isClosingShift ? "not-allowed" : "pointer",
+            opacity: isClosingShift ? 0.5 : 1,
+            transition: "all 0.2s ease",
+            WebkitTapHighlightColor: "transparent",
+            flexShrink: 0,
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" x2="9" y1="12" y2="12" />
+          </svg>
+          {isClosingShift ? "Cerrando…" : "Cerrar Turno"}
+        </button>
+      </div>
+
+      <PedidosPendientes
+        isOpen={isPedidosOpen}
+        onClose={() => setIsPedidosOpen(false)}
+        onPendingCountChange={setPendingCount}
+      />
     </header>
   );
 }

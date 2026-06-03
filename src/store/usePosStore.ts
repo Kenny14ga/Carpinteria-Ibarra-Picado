@@ -40,6 +40,9 @@ type PosStore = {
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   checkout: () => Promise<string | null>;
+  loadClientOrder: (
+    items: { id: string; nombre: string; precio_unitario: number; cantidad: number }[]
+  ) => Promise<{ success: boolean; warnings: string[] }>;
 };
 
 function createId(prefix: string) {
@@ -139,6 +142,77 @@ export const usePosStore = create<PosStore>((set, get) => ({
       cart: [],
       error: null
     });
+  },
+
+  loadClientOrder: async (items) => {
+    const warnings: string[] = [];
+    const normalizedItems: PosCartItem[] = [];
+
+    for (const item of items) {
+      const dbProduct = await db.productos.get(item.id);
+      const dbStock = await db.stock_vitrina.get(item.id);
+      const stockAvailable = dbStock && Number.isFinite(dbStock.cantidad)
+        ? dbStock.cantidad
+        : dbProduct && Number.isFinite(dbProduct.stock_vitrina)
+        ? dbProduct.stock_vitrina
+        : 0;
+
+      if (!dbProduct) {
+        warnings.push(`El producto "${item.nombre}" no existe en el catálogo local y fue omitido.`);
+        continue;
+      }
+
+      let quantityToAdd = item.cantidad;
+      if (quantityToAdd > stockAvailable) {
+        warnings.push(
+          `Stock insuficiente para "${dbProduct.nombre}". Solicitado: ${item.cantidad}, disponible: ${stockAvailable}. Se cargaron ${stockAvailable} ud.`
+        );
+        quantityToAdd = stockAvailable;
+      }
+
+      if (quantityToAdd > 0) {
+        normalizedItems.push({
+          productId: item.id,
+          name: dbProduct.nombre,
+          unitPrice: dbProduct.precio_venta,
+          quantity: quantityToAdd,
+          availableStock: stockAvailable
+        });
+      }
+    }
+
+    if (normalizedItems.length > 0) {
+      set((state) => {
+        const updatedCart = [...state.cart];
+        for (const newItem of normalizedItems) {
+          const existingIndex = updatedCart.findIndex((x) => x.productId === newItem.productId);
+          if (existingIndex !== -1) {
+            const currentQty = updatedCart[existingIndex].quantity;
+            const newQty = Math.min(newItem.availableStock, currentQty + newItem.quantity);
+            if (currentQty + newItem.quantity > newItem.availableStock) {
+              const msg = `Al fusionar "${newItem.name}", se limitó al stock disponible de ${newItem.availableStock} ud.`;
+              if (!warnings.includes(msg)) {
+                warnings.push(msg);
+              }
+            }
+            updatedCart[existingIndex].quantity = newQty;
+          } else {
+            updatedCart.push(newItem);
+          }
+        }
+
+        return {
+          cart: updatedCart,
+          error: warnings.length > 0 ? warnings.join(" | ") : null,
+          lastSaleId: null
+        };
+      });
+    }
+
+    return {
+      success: normalizedItems.length > 0,
+      warnings
+    };
   },
 
   checkout: async () => {

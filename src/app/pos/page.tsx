@@ -4,6 +4,19 @@ import { useState, useMemo, useCallback } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Producto } from "@/lib/db";
 import { usePosStore, type PosCartItem } from "@/store/usePosStore";
+import {
+  Store,
+  Cake,
+  Cookie,
+  Coffee,
+  Croissant,
+  IceCream,
+  ReceiptText,
+  Trash2,
+  X,
+  Plus,
+  Minus
+} from "lucide-react";
 
 /* ─── Helpers ─── */
 
@@ -24,15 +37,15 @@ function formatCurrency(value: number): string {
 }
 
 /* ─── Categorías estáticas para filtro ─── */
-type Categoria = { id: string; label: string; emoji: string };
+type Categoria = { id: string; label: string; icon: React.ComponentType<any> };
 
 const CATEGORIAS: Categoria[] = [
-  { id: "todos", label: "Todos", emoji: "🏪" },
-  { id: "pasteles", label: "Pasteles", emoji: "🎂" },
-  { id: "galletas", label: "Galletas", emoji: "🍪" },
-  { id: "bebidas", label: "Bebidas", emoji: "☕" },
-  { id: "pan", label: "Pan", emoji: "🥖" },
-  { id: "postres", label: "Postres", emoji: "🍰" },
+  { id: "todos", label: "Todos", icon: Store },
+  { id: "pasteles", label: "Pasteles", icon: Cake },
+  { id: "galletas", label: "Galletas", icon: Cookie },
+  { id: "bebidas", label: "Bebidas", icon: Coffee },
+  { id: "pan", label: "Pan", icon: Croissant },
+  { id: "postres", label: "Postres", icon: IceCream },
 ];
 
 /** Inferir categoría a partir del nombre del producto para el filtro local */
@@ -125,9 +138,12 @@ function CategoriesPanel({
               WebkitTapHighlightColor: "transparent",
             }}
           >
-            <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>
-              {cat.emoji}
-            </span>
+            <cat.icon
+              className="h-6 w-6 transition-colors"
+              style={{
+                color: isActive ? "var(--brand-dark)" : "var(--cacao-muted)",
+              }}
+            />
             <span
               style={{
                 fontSize: "0.65rem",
@@ -228,9 +244,15 @@ function VitrinaPanel({ categoriaActiva }: { categoriaActiva: string }) {
               color: "var(--cacao)",
               margin: 0,
               lineHeight: 1.2,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem"
             }}
           >
-            {CATEGORIAS.find((c) => c.id === categoriaActiva)?.emoji}{" "}
+            {(() => {
+              const CatIcon = CATEGORIAS.find((c) => c.id === categoriaActiva)?.icon || Store;
+              return <CatIcon className="h-5 w-5 text-brand" />;
+            })()}
             {categoriaActiva === "todos"
               ? "Todos los Productos"
               : CATEGORIAS.find((c) => c.id === categoriaActiva)?.label}
@@ -564,9 +586,12 @@ function TicketPanel() {
               fontWeight: 900,
               color: "var(--cacao)",
               margin: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.375rem"
             }}
           >
-            🧾 Ticket Actual
+            <ReceiptText className="h-4.5 w-4.5 text-brand" /> Ticket Actual
           </h2>
           <p
             style={{
@@ -600,7 +625,9 @@ function TicketPanel() {
               opacity: isCheckingOut ? 0.5 : 1,
             }}
           >
-            Limpiar
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+              <Trash2 className="h-3 w-3" /> Limpiar
+            </span>
           </button>
         )}
       </div>
@@ -722,17 +749,14 @@ function TicketPanel() {
                       border: "1px solid var(--border-soft)",
                       background: "white",
                       color: "var(--cacao)",
-                      fontSize: "1rem",
-                      fontWeight: 800,
                       cursor: isCheckingOut ? "not-allowed" : "pointer",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      lineHeight: 1,
                       transition: "all 0.15s ease",
                     }}
                   >
-                    −
+                    <Minus className="h-3 w-3" />
                   </button>
                   <span
                     style={{
@@ -764,8 +788,6 @@ function TicketPanel() {
                       border: "1px solid var(--brand-pastel)",
                       background: "var(--brand-cream)",
                       color: "var(--brand-dark)",
-                      fontSize: "1rem",
-                      fontWeight: 800,
                       cursor:
                         isCheckingOut || item.quantity >= item.availableStock
                           ? "not-allowed"
@@ -773,7 +795,6 @@ function TicketPanel() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      lineHeight: 1,
                       transition: "all 0.15s ease",
                       opacity:
                         isCheckingOut || item.quantity >= item.availableStock
@@ -781,7 +802,7 @@ function TicketPanel() {
                           : 1,
                     }}
                   >
-                    +
+                    <Plus className="h-3 w-3" />
                   </button>
                 </div>
 
@@ -797,7 +818,6 @@ function TicketPanel() {
                     border: "none",
                     background: "transparent",
                     color: "var(--cacao-muted)",
-                    fontSize: "0.75rem",
                     cursor: isCheckingOut ? "not-allowed" : "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -807,7 +827,7 @@ function TicketPanel() {
                   }}
                   title="Quitar producto"
                 >
-                  ✕
+                  <X className="h-4 w-4" />
                 </button>
 
                 {/* Subtotal del item */}
