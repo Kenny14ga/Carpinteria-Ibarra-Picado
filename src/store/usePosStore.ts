@@ -259,10 +259,15 @@ export const usePosStore = create<PosStore>((set, get) => ({
             updated_at: timestamp
           });
 
-          await db.productos.update(product.id, {
-            stock_vitrina: nextStock,
-            sync_status: "PENDING"
-          });
+          try {
+            await db.productos.where("id").equals(product.id).modify((p) => {
+              const currentStock = typeof p.stock_vitrina === "number" ? p.stock_vitrina : 0;
+              p.stock_vitrina = currentStock - item.quantity;
+              p.sync_status = "PENDING";
+            });
+          } catch (err) {
+            console.warn(`[Checkout] Fallo la deduccion de inventario local para el producto ${product.id}:`, err);
+          }
 
           productsPayload.push({
             id: product.id,
