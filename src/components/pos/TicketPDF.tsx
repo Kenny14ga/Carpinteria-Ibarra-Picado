@@ -69,7 +69,7 @@ export const TicketPDF: React.FC<TicketPDFProps> = ({ data }) => {
         <LogoIsotipo />
         <h1 className="text-xl font-black mt-2 tracking-tight text-[#8b2e54]">Riquiquísimo</h1>
         <p className="text-xs font-bold tracking-wider text-[#6f4a52] uppercase">Pastelería Artesanal</p>
-        <p className="text-[10px] text-[#8a6c72] italic mt-0.5">"Amor horneado diariamente"</p>
+        <p className="text-[10px] text-[#8a6c72] italic mt-0.5">"postres con cariño, sabor genuino"</p>
       </div>
 
       <div className="border-t border-dashed border-[#f2d6de] my-1" />
