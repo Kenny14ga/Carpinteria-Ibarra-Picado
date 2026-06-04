@@ -367,10 +367,12 @@ export default function CatalogoPage() {
   return (
     <main className="min-h-screen bg-[#FFF6F6] text-[#4A2B32] flex flex-col justify-between">
       <div className="flex-1">
-        {/* Cabecera pública */}
         <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="brand-heading text-lg font-bold italic leading-none text-[#8B2E54]">
+                Riquiquísimo
+              </span>
               <div className="flex items-center gap-2">
                 {/* Botón del Carrito */}
                 <button
@@ -419,7 +421,7 @@ export default function CatalogoPage() {
             alt="Riquiquísimo Logo"
             className="w-32 md:w-48 h-auto drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
           />
-          <h2 className="font-semibold italic text-4xl md:text-5xl text-[#4A2B32] mt-2 select-none">
+          <h2 className="font-semibold italic text-2xl md:text-3xl text-[#4A2B32] mt-2 select-none">
             Postres con Cariño, sabor genuino
           </h2>
           <a
