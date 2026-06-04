@@ -367,12 +367,21 @@ export default function CatalogoPage() {
   return (
     <main className="min-h-screen bg-[#FFF6F6] text-[#4A2B32] flex flex-col justify-between">
       <div className="flex-1">
+        {/* Cabecera pública */}
         <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="brand-heading text-lg font-bold italic leading-none text-[#8B2E54]">
-                Riquiquísimo
-              </span>
+              <div className="flex items-center gap-3 min-w-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/LOGOS/logo-mark.svg"
+                  alt="Riquiquísimo"
+                  className="h-11 w-11 shrink-0 rounded-lg shadow-sm"
+                />
+                <span className="brand-heading text-2xl font-bold italic leading-none text-[#8B2E54]">
+                  Riquiquísimo
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 {/* Botón del Carrito */}
                 <button
@@ -400,8 +409,17 @@ export default function CatalogoPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </header>
 
-            <label className="relative block rounded-full shadow-sm focus-within:shadow-md transition-shadow duration-200">
+        {/* Hero Section Compacto (La Gran Entrada) */}
+        <section className="w-full py-6 bg-gradient-to-b from-pink-50 to-transparent px-4">
+          <div className="mx-auto max-w-5xl flex flex-col items-center gap-4 text-center">
+            <h2 className="font-cursive text-2xl md:text-3xl text-[#4A2B32] select-none">
+              Postres con Cariño, sabor genuino
+            </h2>
+            
+            <label className="relative block w-full max-w-md rounded-full shadow-sm focus-within:shadow-md transition-shadow duration-200">
               <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#B58B96]" />
               <input
                 value={query}
@@ -410,55 +428,36 @@ export default function CatalogoPage() {
                 className="field-control h-12 w-full rounded-full pl-11 pr-4 text-base placeholder:text-[#B58B96]"
               />
             </label>
-          </div>
-        </header>
 
-        {/* Hero Section (La Gran Entrada) */}
-        <section className="w-full py-12 bg-gradient-to-b from-pink-50 to-transparent flex flex-col items-center justify-center text-center px-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/LOGOS/logo-mark.svg"
-            alt="Riquiquísimo Logo"
-            className="w-32 md:w-48 h-auto drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
-          />
-          <h2 className="font-semibold italic text-2xl md:text-3xl text-[#4A2B32] mt-2 select-none">
-            Postres con Cariño, sabor genuino
-          </h2>
-          <a
-            href="#vitrina-productos"
-            className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-8 rounded-full shadow-md transition-all mt-6 inline-block"
-          >
-            Encarga desde nuestra vitrina ↓
-          </a>
+            {/* Banner de Pedido Especial al Repostero */}
+            <div className="w-full rounded-2xl bg-pink-50 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-200">
+              <div className="flex items-center gap-4 text-left">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-700">
+                  <ChefHat className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-gray-800">
+                    ¿Deseas algo personalizado? 🎂
+                  </h3>
+                  <p className="text-xs text-gray-600 leading-relaxed mt-0.5 max-w-md">
+                    Encarga pasteles de cumpleaños, decoraciones especiales o postres a tu medida directamente al repostero por WhatsApp.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsCustomOrderOpen(true)}
+                className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-pink-600 hover:bg-pink-700 px-5 text-xs font-bold uppercase tracking-wider text-white transition active:scale-95 shadow-sm"
+              >
+                <Sparkles className="h-4 w-4 text-white" />
+                Encargar Pedido Especial
+              </button>
+            </div>
+          </div>
         </section>
 
         {/* Listado de Productos */}
         <section id="vitrina-productos" className="mx-auto max-w-5xl px-4 py-5 sm:px-6 scroll-mt-20">
           
-          {/* Banner de Pedido Especial al Repostero */}
-          <div className="mb-6 rounded-2xl bg-pink-50 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-200">
-            <div className="flex items-center gap-4 text-left">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-700">
-                <ChefHat className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-base text-gray-800">
-                  ¿Deseas algo personalizado? 🎂
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed mt-0.5 max-w-md">
-                  Encarga pasteles de cumpleaños, decoraciones especiales o postres a tu medida directamente al repostero por WhatsApp.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsCustomOrderOpen(true)}
-              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-pink-600 hover:bg-pink-700 px-5 text-xs font-bold uppercase tracking-wider text-white transition active:scale-95 shadow-sm"
-            >
-              <Sparkles className="h-4 w-4 text-white" />
-              Encargar Pedido Especial
-            </button>
-          </div>
-
           {loading ? (
             <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-3">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#B83E6C] border-t-transparent"></div>
