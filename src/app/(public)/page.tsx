@@ -12,11 +12,13 @@ import {
   Plus,
   Minus,
   Check,
-  ArrowRight
+  ArrowRight,
+  ChefHat
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { Footer } from "@/components/public/Footer";
+import { generateWhatsAppLink } from "@/lib/utils/whatsapp";
 
 // Definición local del tipo Producto para evitar dependencias
 type Producto = {
@@ -93,7 +95,19 @@ export default function CatalogoPage() {
   const [cart, setCart] = useState<ClientCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+  const [clientAddress, setClientAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estado para pedidos personalizados al repostero
+  const [isCustomOrderOpen, setIsCustomOrderOpen] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [customPhone, setCustomPhone] = useState("");
+  const [customAddress, setCustomAddress] = useState("");
+  const [customDetails, setCustomDetails] = useState("");
+  const [customDate, setCustomDate] = useState("");
+  const [customServings, setCustomServings] = useState("");
+  const [isCustomSubmitting, setIsCustomSubmitting] = useState(false);
 
   // Cargar productos directamente desde Supabase (para asegurar stock y precios reales del servidor)
   useEffect(() => {
@@ -190,6 +204,14 @@ export default function CatalogoPage() {
       alert("Por favor ingresa tu nombre para registrar el pedido.");
       return;
     }
+    if (!clientPhone.trim()) {
+      alert("Por favor ingresa tu número de teléfono.");
+      return;
+    }
+    if (!clientAddress.trim()) {
+      alert("Por favor ingresa tu dirección de entrega.");
+      return;
+    }
     if (cart.length === 0) return;
 
     setIsSubmitting(true);
@@ -197,6 +219,8 @@ export default function CatalogoPage() {
       // 1. Insertar registro en Supabase
       const payload = {
         cliente_nombre: clientName.trim(),
+        telefono: clientPhone.trim(),
+        direccion: clientAddress.trim(),
         items: cart.map((item) => ({
           id: item.producto.id,
           nombre: item.producto.nombre,
@@ -207,7 +231,8 @@ export default function CatalogoPage() {
         estado: "ESPERANDO_WSP"
       };
 
-      const { data, error, status } = await (supabase.from("pedidos_clientes" as any) as any)
+      const { data, error, status } = await supabase
+        .from("pedidos_clientes")
         .insert(payload)
         .select("id")
         .single();
@@ -220,14 +245,17 @@ export default function CatalogoPage() {
       // 2. Extraer código corto del UUID
       const shortCode = data.id.split("-")[0].toUpperCase();
 
-      // 3. Generar mensaje de WhatsApp
-      const itemsText = cart
-        .map((item) => `- ${item.cantidad}x ${item.producto.nombre} (${formatCurrency(item.producto.precio_venta * item.cantidad)})`)
-        .join("\n");
-      const wspMessage = `¡Hola! Soy ${clientName.trim()}, mi código de pedido es #${shortCode} y quiero confirmar mi carrito:\n\n${itemsText}\n\nTotal: ${formatCurrency(cartTotal)}`;
-
-      const phone = "50588888888"; // Número de la pastelería
-      const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(wspMessage)}`;
+      // 3. Generar enlace y mensaje de WhatsApp
+      const whatsappUrl = generateWhatsAppLink(
+        data.id,
+        clientName,
+        payload.items,
+        cartTotal,
+        {
+          telefono: clientPhone,
+          direccion: clientAddress
+        }
+      );
 
       // 4. Redirigir a WhatsApp
       window.open(whatsappUrl, "_blank");
@@ -236,12 +264,99 @@ export default function CatalogoPage() {
       alert(`¡Pedido registrado! Tu código de aprobación es #${shortCode}. Redirigiendo a WhatsApp...`);
       clearCart();
       setClientName("");
+      setClientPhone("");
+      setClientAddress("");
       setIsCartOpen(false);
     } catch (err) {
       console.error("[Checkout] Error al enviar pedido híbrido:", err);
       alert("No pudimos registrar tu pedido. Revisa tu conexión a internet e inténtalo de nuevo.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Lógica para enviar Pedido Personalizado al Repostero
+  const handleCustomOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customName.trim()) {
+      alert("Por favor ingresa tu nombre completo.");
+      return;
+    }
+    if (!customPhone.trim()) {
+      alert("Por favor ingresa tu número de teléfono.");
+      return;
+    }
+    if (!customAddress.trim()) {
+      alert("Por favor ingresa tu dirección de entrega.");
+      return;
+    }
+    if (!customDetails.trim()) {
+      alert("Por favor describe lo que deseas encargar.");
+      return;
+    }
+
+    setIsCustomSubmitting(true);
+    try {
+      // Insertar en Supabase. items = [] y total = 0
+      const payload = {
+        cliente_nombre: customName.trim(),
+        telefono: customPhone.trim(),
+        direccion: customAddress.trim(),
+        detalles_personalizados: customDetails.trim(),
+        items: [
+          {
+            id: "custom-order",
+            nombre: "Pedido Personalizado (Ver detalles)",
+            cantidad: 1,
+            precio_unitario: 0
+          }
+        ],
+        total: 0,
+        estado: "ESPERANDO_WSP"
+      };
+
+      const { data, error, status } = await supabase
+        .from("pedidos_clientes")
+        .insert(payload)
+        .select("id")
+        .single();
+
+      if (error || !data || status < 200 || status >= 300) {
+        throw error || new Error(`No se obtuvo respuesta exitosa de Supabase (status: ${status})`);
+      }
+
+      const shortCode = data.id.split("-")[0].toUpperCase();
+      const whatsappUrl = generateWhatsAppLink(
+        data.id,
+        customName,
+        [],
+        0,
+        {
+          telefono: customPhone,
+          direccion: customAddress,
+          detalles_personalizados: customDetails,
+          fecha_entrega: customDate,
+          porciones: customServings
+        }
+      );
+
+      window.open(whatsappUrl, "_blank");
+
+      alert(`¡Encargo registrado! Código de aprobación: #${shortCode}. Redirigiendo al repostero por WhatsApp...`);
+      
+      // Limpiar campos
+      setCustomName("");
+      setCustomPhone("");
+      setCustomAddress("");
+      setCustomDetails("");
+      setCustomDate("");
+      setCustomServings("");
+      setIsCustomOrderOpen(false);
+    } catch (err) {
+      console.error("[CustomOrder] Error al enviar pedido personalizado:", err);
+      alert("No pudimos registrar tu encargo. Revisa tu conexión a internet e inténtalo de nuevo.");
+    } finally {
+      setIsCustomSubmitting(false);
     }
   };
 
@@ -315,6 +430,31 @@ export default function CatalogoPage() {
 
         {/* Listado de Productos */}
         <section className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
+          
+          {/* Banner de Pedido Especial al Repostero */}
+          <div className="mb-6 rounded-2xl border border-[#F2D6DE] bg-gradient-to-r from-[#FFF5F6] to-[#FFF9F5] p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-left">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FDE1E6] text-[#8B2E54]">
+                <ChefHat className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-[#4A2B32]">
+                  ¿Deseas algo personalizado? 🎂
+                </h3>
+                <p className="text-xs text-[#6F4A52] leading-relaxed mt-0.5 max-w-md">
+                  Encarga pasteles de cumpleaños, decoraciones especiales o postres a tu medida directamente al repostero por WhatsApp.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsCustomOrderOpen(true)}
+              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#B83E6C] px-5 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#8B2E54] transition active:scale-95 shadow-sm"
+            >
+              <Sparkles className="h-4 w-4" />
+              Encargar Pedido Especial
+            </button>
+          </div>
+
           {loading ? (
             <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-3">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#B83E6C] border-t-transparent"></div>
@@ -490,7 +630,34 @@ export default function CatalogoPage() {
                       placeholder="Ej. Roberto Martínez"
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
-                      className="w-full h-11 border border-[#F2D6DE] rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                      className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#6F4A52] uppercase tracking-wide mb-1">
+                      Teléfono de Contacto
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="Ej. 8888-8888"
+                      value={clientPhone}
+                      onChange={(e) => setClientPhone(e.target.value)}
+                      className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#6F4A52] uppercase tracking-wide mb-1">
+                      Dirección de Entrega
+                    </label>
+                    <textarea
+                      required
+                      placeholder="Dirección exacta para la entrega de tu pedido..."
+                      value={clientAddress}
+                      onChange={(e) => setClientAddress(e.target.value)}
+                      className="w-full min-h-[70px] border border-[#F2D6DE] bg-white rounded-lg p-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300 resize-none"
                     />
                   </div>
 
@@ -511,6 +678,140 @@ export default function CatalogoPage() {
                 </form>
               </footer>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Cajón lateral de Pedidos Personalizados */}
+      {isCustomOrderOpen && (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/45 backdrop-blur-sm"
+          onClick={() => setIsCustomOrderOpen(false)}
+        >
+          <div
+            className="w-full max-w-md h-full bg-[#FFF9F5] border-l border-[#F2D6DE] shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Cabecera del Cajón */}
+            <header className="flex h-16 items-center justify-between border-b border-[#F2D6DE] bg-white px-5">
+              <div className="flex items-center gap-2">
+                <ChefHat className="h-5 w-5 text-[#B83E6C]" />
+                <h3 className="font-extrabold text-lg text-[#4A2B32]">Pedido Especial</h3>
+              </div>
+              <button
+                onClick={() => setIsCustomOrderOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#F2D6DE] text-[#6F4A52] hover:bg-[#FFF6F6] transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </header>
+
+            {/* Formulario */}
+            <form onSubmit={handleCustomOrderSubmit} className="flex-1 flex flex-col justify-between overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                <p className="text-xs text-[#6F4A52] leading-relaxed bg-[#FFF0EE] border border-[#FDE1E6] rounded-xl p-3.5">
+                  Cuéntanos qué delicia deseas encargar (sabor, temática, porciones). Guardaremos tu solicitud en el sistema y te guiaremos a WhatsApp para cotizar directamente con el repostero.
+                </p>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                    Nombre Completo
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. Roberto Martínez"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                      Teléfono
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="Ej. 8888-8888"
+                      value={customPhone}
+                      onChange={(e) => setCustomPhone(e.target.value)}
+                      className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                      Porciones / Cantidad
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej. 25 porciones"
+                      value={customServings}
+                      onChange={(e) => setCustomServings(e.target.value)}
+                      className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                    Fecha Requerida
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={customDate}
+                    onChange={(e) => setCustomDate(e.target.value)}
+                    className="w-full h-11 border border-[#F2D6DE] bg-white rounded-lg px-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                    Dirección de Entrega
+                  </label>
+                  <textarea
+                    required
+                    placeholder="Dirección exacta para la entrega del postre..."
+                    value={customAddress}
+                    onChange={(e) => setCustomAddress(e.target.value)}
+                    className="w-full min-h-[70px] border border-[#F2D6DE] bg-white rounded-lg p-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#6F4A52] uppercase tracking-wider mb-1">
+                    Detalles del Encargo (Postre, diseño, sabor)
+                  </label>
+                  <textarea
+                    required
+                    placeholder="Describe el postre: pastel de 2 pisos de chocolate con vainilla, decoración rústica..."
+                    value={customDetails}
+                    onChange={(e) => setCustomDetails(e.target.value)}
+                    className="w-full min-h-[90px] border border-[#F2D6DE] bg-white rounded-lg p-3 text-sm focus:outline-none focus:border-[#B83E6C] placeholder:text-stone-300 resize-none"
+                  />
+                </div>
+              </div>
+
+              <footer className="border-t border-[#F2D6DE] bg-white p-5">
+                <button
+                  type="submit"
+                  disabled={isCustomSubmitting}
+                  className="w-full h-12 bg-[#B83E6C] hover:bg-[#8B2E54] text-white font-extrabold rounded-lg text-sm uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition disabled:opacity-50"
+                >
+                  {isCustomSubmitting ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      Enviar Encargo por WhatsApp
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </footer>
+            </form>
           </div>
         </div>
       )}

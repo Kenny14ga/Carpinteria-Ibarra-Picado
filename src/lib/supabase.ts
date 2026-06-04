@@ -241,6 +241,39 @@ type RecetaInsumosTable = {
   Relationships: [];
 };
 
+export type PedidoClienteRow = {
+  id: string;
+  cliente_nombre: string;
+  telefono: string | null;
+  direccion: string | null;
+  detalles_personalizados: string | null;
+  items: Json;
+  total: number;
+  estado: string;
+  created_at: string;
+};
+
+type PedidoClienteInsert = {
+  id?: string;
+  cliente_nombre: string;
+  telefono?: string | null;
+  direccion?: string | null;
+  detalles_personalizados?: string | null;
+  items: Json;
+  total: number;
+  estado?: string;
+  created_at?: string;
+};
+
+type PedidoClienteUpdate = Partial<PedidoClienteInsert>;
+
+type PedidosClientesTable = {
+  Row: PedidoClienteRow;
+  Insert: PedidoClienteInsert;
+  Update: PedidoClienteUpdate;
+  Relationships: [];
+};
+
 type ProcesarProduccionResult = {
   lote_id: string;
   receta_id: string;
@@ -259,6 +292,7 @@ export type Database = {
       receta_insumos: RecetaInsumosTable;
       recetas: RecetasTable;
       transacciones_sync: TransaccionSyncTable;
+      pedidos_clientes: PedidosClientesTable;
     };
     Views: Record<string, never>;
     Functions: {

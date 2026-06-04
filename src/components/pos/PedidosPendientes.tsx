@@ -3,11 +3,14 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePosStore } from "@/store/usePosStore";
-import { X, Check, Trash2, Inbox, AlertTriangle, RefreshCw, AlertCircle } from "lucide-react";
+import { X, Check, Trash2, Inbox, AlertTriangle, RefreshCw, AlertCircle, ChefHat } from "lucide-react";
 
 type PedidoCliente = {
   id: string;
   cliente_nombre: string;
+  telefono?: string;
+  direccion?: string;
+  detalles_personalizados?: string;
   items: { id: string; nombre: string; precio_unitario: number; cantidad: number }[];
   total: number;
   estado: "ESPERANDO_WSP" | "ACEPTADO" | "RECHAZADO";
@@ -79,16 +82,16 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
 
     // 3. Suscripción a canal Realtime
     const channel = supabase
-      .channel("pedidos_realtime_pos")
+      .channel("pedidos")
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "pedidos_clientes",
         },
         (payload) => {
-          console.log("[PedidosPendientes] Cambio en base de datos detectado:", payload);
+          console.log("[PedidosPendientes] Nuevo pedido insertado detectado:", payload);
           // Volver a consultar para asegurar consistencia del estado
           fetchPedidos();
         }
@@ -242,6 +245,35 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
                       {formatCurrency(pedido.total)}
                     </span>
                   </div>
+
+                  {/* Datos de contacto si existen */}
+                  {(pedido.telefono || pedido.direccion) && (
+                    <div className="text-[11px] text-[#6F4A52]/80 space-y-0.5 border-l-2 border-[#FDE1E6] pl-2">
+                      {pedido.telefono && (
+                        <p>
+                          <strong>Teléfono:</strong> {pedido.telefono}
+                        </p>
+                      )}
+                      {pedido.direccion && (
+                        <p className="line-clamp-2" title={pedido.direccion}>
+                          <strong>Dirección:</strong> {pedido.direccion}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Detalles personalizados para encargos especiales */}
+                  {pedido.detalles_personalizados && (
+                    <div className="rounded-xl bg-[#FFF5F6] border border-[#F2D6DE] p-2.5 text-xs text-[#8B2E54]">
+                      <p className="font-bold flex items-center gap-1.5 text-[#8B2E54] mb-1">
+                        <ChefHat className="h-3.5 w-3.5" />
+                        Encargo Especial:
+                      </p>
+                      <p className="text-[#6F4A52] leading-relaxed italic">
+                        "{pedido.detalles_personalizados}"
+                      </p>
+                    </div>
+                  )}
 
                   {/* Listado de items del pedido */}
                   <div className="rounded-xl bg-[#FFF9F5] border border-[#FDE1E6] p-2.5 space-y-1.5">
