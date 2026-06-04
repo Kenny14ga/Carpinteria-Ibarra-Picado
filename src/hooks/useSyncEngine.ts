@@ -51,8 +51,11 @@ function describeError(error: unknown) {
 }
 
 async function sendTransactionToSupabase(item: SyncQueueItem) {
+  // Mapeo defensivo del payload: aseguramos que coincida estrictamente con las columnas de transacciones_sync.
+  // Si en Dexie existe tipo_accion, se usa, de lo contrario se cae en action o accion.
+  // La columna final en la base de datos es 'tipo_accion'.
   const payload = {
-    tipo_accion: getSyncQueueAction(item),
+    tipo_accion: (item as any).tipo_accion || item.action || item.accion || "UNKNOWN_ACTION",
     payload: serializePayload(item.payload),
     creado_en_cliente: new Date(item.timestamp).toISOString(),
     estado: getSyncQueueStatus(item)
@@ -60,26 +63,25 @@ async function sendTransactionToSupabase(item: SyncQueueItem) {
 
   console.log("🚀 [Sync] Enviando payload: ", payload);
 
-  try {
-    const { data, error, status, statusText } = await supabase
-      .from("transacciones_sync")
-      .insert(payload)
-      .select();
+  const { data, error } = await supabase
+    .from("transacciones_sync")
+    .insert(payload)
+    .select();
 
-    if (error || !isSuccessfulStatus(status)) {
-      const errObj = error || new Error(`Supabase respondio ${status} ${statusText}`);
-      console.error("❌ [Sync] Error de Supabase: ", errObj);
-      if (error?.details) {
-        console.error("❌ [Sync] Detalles del error: ", error.details);
-      }
-      throw errObj;
+  if (error) {
+    console.error("❌ [Sync] Error devuelto por Supabase:", error);
+    if (error.message || error.details) {
+      console.error("❌ [Sync] Detalles del error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
     }
-
-    console.log("✅ [Sync] Inserción exitosa en Supabase:", data);
-  } catch (err) {
-    console.error("❌ [Sync] Error de Supabase (excepcion): ", err);
-    throw err;
+    throw error;
   }
+
+  console.log("✅ [Sync] Inserción exitosa en Supabase:", data);
+  return data;
 }
 
 export function useSyncEngine(): SyncEngineState {
@@ -137,19 +139,21 @@ export function useSyncEngine(): SyncEngineState {
 
         try {
           await sendTransactionToSupabase(item);
+          // Limpieza Automática (Auto-Clear) inmediatamente después del insert exitoso
           await db.sync_queue.delete(item.id);
           console.log(`🗑️ [Sync] Transacción ${item.id} eliminada con éxito de IndexedDB.`);
         } catch (error) {
           const message = describeError(error);
           console.error("❌ [Sync] Fallo al sincronizar transacción individual:", {
             queueId: item.id,
-            accion: getSyncQueueAction(item),
+            accion: (item as any).tipo_accion || item.action || item.accion || "UNKNOWN_ACTION",
             error
           });
 
+          // Tolerancia a fallos individuales: actualiza a FAILED en Dexie y continúa
           await db.sync_queue.update(item.id, { estado: "FAILED", synced: false });
           setLastError(message);
-          // Tolerancia a fallos individuales: no hacemos break, dejamos que continúe con la siguiente.
+          continue;
         }
       }
     } finally {
