@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { PackageOpen, Search } from "lucide-react";
+import { PackageOpen, Search, ImageIcon } from "lucide-react";
 import { db, type Producto } from "@/lib/db";
 import { usePosStore } from "@/store/usePosStore";
 
@@ -20,6 +20,41 @@ function formatCurrency(value: number) {
     currency: "NIO",
     maximumFractionDigits: 2
   }).format(value);
+}
+
+function ProductPhoto({ producto }: { producto: Producto }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const hasBlob = producto.imagen_blob instanceof Blob;
+  const hasUrl = Boolean(producto.imagen_url);
+
+  useEffect(() => {
+    if (!hasBlob || !producto.imagen_blob || !imageRef.current) {
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(producto.imagen_blob);
+    imageRef.current.src = objectUrl;
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [hasBlob, producto.imagen_blob]);
+
+  if (!hasBlob && !hasUrl) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-stone-100">
+        <ImageIcon aria-hidden="true" className="h-6 w-6 text-stone-400" />
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imageRef}
+      src={hasBlob ? undefined : producto.imagen_url}
+      alt={producto.nombre}
+      className="h-full w-full object-cover"
+    />
+  );
 }
 
 // Function to dynamically assign color classes based on the product category or keywords
@@ -155,28 +190,59 @@ export function ProductGrid() {
                   type="button"
                   onClick={() => !isOutOfStock && addToCart(producto)}
                   disabled={isOutOfStock}
-                  className={`flex flex-col justify-between min-h-[7.5rem] rounded-2xl border p-4 text-left shadow-[var(--shadow-xs)] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 ${colors.bg} ${
+                  className={`flex flex-col rounded-2xl border text-left shadow-[var(--shadow-xs)] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 overflow-hidden ${colors.bg} ${
                     isOutOfStock
                       ? "opacity-45 cursor-not-allowed border-gray-200 bg-gray-50/50 text-gray-400"
                       : "active:scale-95"
                   }`}
+                  style={{ minHeight: "10.5rem" }}
                 >
-                  <p className="text-sm sm:text-base font-bold leading-tight line-clamp-2">
-                    {producto.nombre}
-                  </p>
-                  <div className="mt-4 flex items-end justify-between gap-1.5">
-                    <span className="text-sm sm:text-base font-extrabold">
-                      {formatCurrency(producto.precio_venta)}
-                    </span>
-                    <span
-                      className={`rounded-lg border px-2 py-0.5 text-xs font-bold ${
-                        isOutOfStock
-                          ? "bg-gray-100 text-gray-500 border-gray-200"
-                          : colors.pill
-                      }`}
-                    >
-                      {isOutOfStock ? "Agotado" : `${remainingStock} ud`}
-                    </span>
+                  {/* Foto del producto */}
+                  <div
+                    style={{
+                      width: "100%",
+                      aspectRatio: "4/3",
+                      position: "relative",
+                      background: "#f5ecea",
+                      overflow: "hidden",
+                      borderBottom: isOutOfStock
+                        ? "1.5px solid #e5e7eb"
+                        : "1.5px solid var(--border-soft)",
+                    }}
+                  >
+                    <ProductPhoto producto={producto} />
+                  </div>
+
+                  {/* Detalles */}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: "0.625rem 0.5rem",
+                      gap: "0.375rem",
+                      flex: 1,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <p className="text-xs sm:text-sm font-bold leading-tight line-clamp-2 text-center w-full">
+                      {producto.nombre}
+                    </p>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.25rem", width: "100%" }}>
+                      <span className="text-sm font-extrabold text-center">
+                        {formatCurrency(producto.precio_venta)}
+                      </span>
+                      <span
+                        className={`rounded-lg border px-1.5 py-0.5 text-[10px] sm:text-xs font-bold ${
+                          isOutOfStock
+                            ? "bg-gray-100 text-gray-500 border-gray-200"
+                            : colors.pill
+                        }`}
+                      >
+                        {isOutOfStock ? "Agotado" : `${remainingStock} ud`}
+                      </span>
+                    </div>
                   </div>
                 </button>
               );

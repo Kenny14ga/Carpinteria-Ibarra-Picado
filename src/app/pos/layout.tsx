@@ -153,35 +153,18 @@ function TopBar() {
     >
       {/* Izquierda: Logo + nombre de usuario */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-        <div
+        <img
+          src="/LOGOS/logo-mark.svg"
+          alt="Riquiquísimo"
           style={{
             width: "2.25rem",
             height: "2.25rem",
             borderRadius: "0.625rem",
-            background:
-              "linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            objectFit: "contain",
             boxShadow: "0 2px 8px rgba(184, 62, 108, 0.25)",
             flexShrink: 0,
           }}
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-            <line x1="3" x2="21" y1="6" y2="6" />
-            <path d="M16 10a4 4 0 0 1-8 0" />
-          </svg>
-        </div>
+        />
         <div className="hidden sm:block" style={{ minWidth: 0 }}>
           <p
             style={{
@@ -194,7 +177,7 @@ function TopBar() {
               marginBottom: "0.125rem",
             }}
           >
-            Punto de Venta
+            Riquiquísimo
           </p>
           <p
             style={{
@@ -402,6 +385,7 @@ export default function PosLayout({
               en_vitrina: p.en_vitrina || false,
               stock_vitrina: p.stock_vitrina || 0,
               alergenos: p.alergenos || [],
+              imagen_url: p.imagen_url || null,
               sync_status: "SYNCED"
             }))
           );

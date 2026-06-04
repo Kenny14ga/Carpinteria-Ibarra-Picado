@@ -86,12 +86,12 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "pedidos_clientes",
         },
         (payload) => {
-          console.log("[PedidosPendientes] Nuevo pedido insertado detectado:", payload);
+          console.log("[PedidosPendientes] Cambio en base de datos detectado:", payload);
           // Volver a consultar para asegurar consistencia del estado
           fetchPedidos();
         }

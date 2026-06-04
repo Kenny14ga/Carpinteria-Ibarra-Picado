@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Producto } from "@/lib/db";
 import { usePosStore, type PosCartItem } from "@/store/usePosStore";
@@ -15,7 +15,8 @@ import {
   Trash2,
   X,
   Plus,
-  Minus
+  Minus,
+  ImageIcon
 } from "lucide-react";
 
 /* ─── Helpers ─── */
@@ -34,6 +35,41 @@ function formatCurrency(value: number): string {
     currency: "NIO",
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function ProductPhoto({ producto }: { producto: Producto }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const hasBlob = producto.imagen_blob instanceof Blob;
+  const hasUrl = Boolean(producto.imagen_url);
+
+  useEffect(() => {
+    if (!hasBlob || !producto.imagen_blob || !imageRef.current) {
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(producto.imagen_blob);
+    imageRef.current.src = objectUrl;
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [hasBlob, producto.imagen_blob]);
+
+  if (!hasBlob && !hasUrl) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-stone-100">
+        <ImageIcon aria-hidden="true" className="h-6 w-6 text-stone-400" />
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imageRef}
+      src={hasBlob ? undefined : producto.imagen_url}
+      alt={producto.nombre}
+      className="h-full w-full object-cover"
+    />
+  );
 }
 
 /* ─── Categorías estáticas para filtro ─── */
@@ -424,9 +460,7 @@ function VitrinaPanel({
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "1.125rem 0.75rem",
+                    alignItems: "stretch",
                     borderRadius: "1rem",
                     border: isOutOfStock
                       ? "1.5px solid #e5e7eb"
@@ -443,11 +477,10 @@ function VitrinaPanel({
                     boxShadow: isOutOfStock ? "none" : "var(--shadow-xs)",
                     WebkitTapHighlightColor: "transparent",
                     animation: `fade-in-up 0.35s ease-out ${index * 40}ms both`,
-                    gap: "0.5rem",
-                    textAlign: "center",
-                    minHeight: "8rem",
                     opacity: isOutOfStock ? 0.45 : 1,
                     position: "relative",
+                    overflow: "hidden",
+                    minHeight: "10.5rem",
                   }}
                   onMouseEnter={(e) => {
                     if (!isOutOfStock) {
@@ -479,8 +512,8 @@ function VitrinaPanel({
                     <span
                       style={{
                         position: "absolute",
-                        top: "-0.375rem",
-                        right: "-0.375rem",
+                        top: "0.375rem",
+                        right: "0.375rem",
                         width: "1.375rem",
                         height: "1.375rem",
                         borderRadius: "50%",
@@ -493,59 +526,94 @@ function VitrinaPanel({
                         justifyContent: "center",
                         boxShadow: "0 2px 6px rgba(184, 62, 108, 0.35)",
                         animation: "scale-in 0.2s ease-out both",
+                        zIndex: 10,
                       }}
                     >
                       {inCart}
                     </span>
                   )}
 
-                  {/* Nombre del producto */}
-                  <span
+                  {/* Foto del producto */}
+                  <div
                     style={{
-                      fontSize: "0.78rem",
-                      fontWeight: 700,
-                      color: isOutOfStock ? "#9ca3af" : "var(--cacao)",
-                      lineHeight: 1.25,
-                      maxWidth: "100%",
+                      width: "100%",
+                      aspectRatio: "4/3",
+                      position: "relative",
+                      background: "#f5ecea",
                       overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
+                      borderBottom: isOutOfStock
+                        ? "1.5px solid #e5e7eb"
+                        : inCart > 0
+                          ? "2px solid var(--brand-pastel)"
+                          : "1.5px solid var(--border-soft)",
                     }}
                   >
-                    {producto.nombre}
-                  </span>
+                    <ProductPhoto producto={producto} />
+                  </div>
 
-                  {/* Precio */}
-                  <span
+                  {/* Detalles */}
+                  <div
                     style={{
-                      fontSize: "0.85rem",
-                      fontWeight: 900,
-                      color: isOutOfStock ? "#9ca3af" : "var(--brand-dark)",
-                      letterSpacing: "-0.01em",
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: "0.625rem 0.5rem",
+                      gap: "0.375rem",
+                      flex: 1,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
                     }}
                   >
-                    {formatCurrency(producto.precio_venta)}
-                  </span>
+                    {/* Nombre del producto */}
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        color: isOutOfStock ? "#9ca3af" : "var(--cacao)",
+                        lineHeight: 1.25,
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {producto.nombre}
+                    </span>
 
-                  {/* Stock badge */}
-                  <span
-                    style={{
-                      fontSize: "0.6rem",
-                      fontWeight: 700,
-                      padding: "0.125rem 0.5rem",
-                      borderRadius: "9999px",
-                      background: isOutOfStock
-                        ? "#f3f4f6"
-                        : "var(--brand-cream)",
-                      color: isOutOfStock ? "#9ca3af" : "var(--brand-dark)",
-                      letterSpacing: "0.03em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {isOutOfStock ? "Agotado" : `${remainingStock} ud`}
-                  </span>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.25rem", width: "100%" }}>
+                      {/* Precio */}
+                      <span
+                        style={{
+                          fontSize: "0.8rem",
+                          fontWeight: 900,
+                          color: isOutOfStock ? "#9ca3af" : "var(--brand-dark)",
+                          letterSpacing: "-0.01em",
+                        }}
+                      >
+                        {formatCurrency(producto.precio_venta)}
+                      </span>
+
+                      {/* Stock badge */}
+                      <span
+                        style={{
+                          fontSize: "0.55rem",
+                          fontWeight: 700,
+                          padding: "0.1rem 0.375rem",
+                          borderRadius: "9999px",
+                          background: isOutOfStock
+                            ? "#f3f4f6"
+                            : "var(--brand-cream)",
+                          color: isOutOfStock ? "#9ca3af" : "var(--brand-dark)",
+                          letterSpacing: "0.03em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {isOutOfStock ? "Agotado" : `${remainingStock} ud`}
+                      </span>
+                    </div>
+                  </div>
                 </button>
               );
             })}

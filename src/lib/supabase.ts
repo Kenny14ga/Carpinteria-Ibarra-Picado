@@ -1,3 +1,4 @@
+import { createBrowserClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import type { QueueStatus } from "@/lib/db";
 
@@ -324,14 +325,7 @@ export const isSupabaseConfigured = Boolean(
     !supabaseAnonKey.includes("replace")
 );
 
-export const supabase = createClient<Database>(
+export const supabase = createBrowserClient<Database>(
   supabaseUrl ?? fallbackUrl,
-  supabaseAnonKey ?? fallbackAnonKey,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: false
-    }
-  }
+  supabaseAnonKey ?? fallbackAnonKey
 );
