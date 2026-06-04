@@ -370,28 +370,7 @@ export default function CatalogoPage() {
         {/* Cabecera pública */}
         <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/LOGOS/logo-mark.svg"
-                  alt="Riquiquísimo"
-                  className="h-11 w-11 shrink-0 rounded-lg shadow-sm"
-                />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="brand-heading text-lg font-bold italic leading-none text-[#8B2E54]">
-                      Riquiquísimo
-                    </span>
-                    <span className="rounded-full bg-[#FDE1E6] px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-[#8B2E54]">
-                      Vitrina
-                    </span>
-                  </div>
-                  <h1 className="text-xs font-semibold text-[#6F4A52]/80 mt-1.5 italic">
-                    “Postres con cariño, sabor genuino”
-                  </h1>
-                </div>
-              </div>
+            <div className="flex items-center justify-end gap-3">
               <div className="flex items-center gap-2">
                 {/* Botón del Carrito */}
                 <button
@@ -440,7 +419,7 @@ export default function CatalogoPage() {
             alt="Riquiquísimo Logo"
             className="w-32 md:w-48 h-auto drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
           />
-          <h2 className="font-cursive text-4xl md:text-5xl text-[#4A2B32] mt-2 select-none">
+          <h2 className="font-semibold italic text-4xl md:text-5xl text-[#4A2B32] mt-2 select-none">
             Postres con Cariño, sabor genuino
           </h2>
           <a
@@ -455,7 +434,7 @@ export default function CatalogoPage() {
         <section id="vitrina-productos" className="mx-auto max-w-5xl px-4 py-5 sm:px-6 scroll-mt-20">
           
           {/* Banner de Pedido Especial al Repostero */}
-          <div className="mb-6 rounded-2xl bg-white p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-200">
+          <div className="mb-6 rounded-2xl bg-pink-50 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-200">
             <div className="flex items-center gap-4 text-left">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-700">
                 <ChefHat className="h-6 w-6" />
