@@ -80,6 +80,10 @@ a {
   font-weight: 700;
 }
 
+.font-cursive {
+  font-family: var(--font-cursive), cursive;
+}
+
 /* ─── Page shells ─── */
 .app-page {
   min-height: 100vh;

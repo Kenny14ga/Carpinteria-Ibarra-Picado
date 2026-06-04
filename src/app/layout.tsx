@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Serif_Display } from "next/font/google";
+import { Inter, Noto_Serif_Display, Great_Vibes } from "next/font/google";
 import "./globals.css";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 import { SyncEngineRuntime } from "@/hooks/useSyncEngine";
@@ -16,6 +16,13 @@ const notoSerif = Noto_Serif_Display({
   weight: ["700", "900"],
   style: ["normal", "italic"],
   variable: "--font-display"
+});
+
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400"],
+  variable: "--font-cursive"
 });
 
 export const metadata: Metadata = {
@@ -47,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${notoSerif.variable}`}>
+    <html lang="es" className={`${inter.variable} ${notoSerif.variable} ${greatVibes.variable}`}>
       <body>
         <SyncEngineRuntime />
         {children}

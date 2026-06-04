@@ -69,20 +69,22 @@ function ProductPhoto({ producto }: { producto: Producto }) {
 
   if (!hasBlob && !hasUrl) {
     return (
-      <div className="flex aspect-[4/3] w-full items-center justify-center bg-stone-100">
-        <ImageIcon aria-hidden="true" className="h-10 w-10 text-stone-400" />
+      <div className="flex aspect-[4/3] w-full items-center justify-center bg-stone-100 overflow-hidden">
+        <ImageIcon aria-hidden="true" className="h-10 w-10 text-stone-400 transform transition-transform duration-500 group-hover:scale-110" />
       </div>
     );
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      ref={imageRef}
-      src={hasBlob ? undefined : producto.imagen_url}
-      alt={producto.nombre}
-      className="aspect-[4/3] w-full object-cover"
-    />
+    <div className="aspect-[4/3] w-full overflow-hidden bg-stone-100 relative">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={imageRef}
+        src={hasBlob ? undefined : producto.imagen_url}
+        alt={producto.nombre}
+        className="h-full w-full object-cover transform transition-transform duration-500 group-hover:scale-105"
+      />
+    </div>
   );
 }
 
@@ -418,41 +420,54 @@ export default function CatalogoPage() {
               </div>
             </div>
 
-            <label className="relative block">
-              <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#B58B96]" />
+            <label className="relative block rounded-full shadow-sm focus-within:shadow-md transition-shadow duration-200">
+              <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#B58B96]" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Buscar por nombre, descripción o alérgeno"
-                className="field-control h-12 w-full rounded-md pl-10 pr-3 text-base placeholder:text-[#B58B96]"
+                className="field-control h-12 w-full rounded-full pl-11 pr-4 text-base placeholder:text-[#B58B96]"
               />
             </label>
           </div>
         </header>
 
+        {/* Hero Section (La Gran Entrada) */}
+        <section className="w-full py-12 bg-gradient-to-b from-pink-50 to-transparent flex flex-col items-center justify-center text-center px-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/LOGOS/logo-mark.svg"
+            alt="Riquiquísimo Logo"
+            className="h-20 w-20 md:h-24 md:w-24 drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
+          />
+          <h2 className="font-cursive text-3xl md:text-5xl text-[#4A2B32] mt-2 select-none">
+            Postres con Cariño, sabor genuino
+          </h2>
+        </section>
+
         {/* Listado de Productos */}
         <section className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
           
           {/* Banner de Pedido Especial al Repostero */}
-          <div className="mb-6 rounded-2xl border border-[#F2D6DE] bg-gradient-to-r from-[#FFF5F6] to-[#FFF9F5] p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="mb-6 rounded-2xl bg-[#4A2B32] p-5 sm:p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 border border-[#F2D6DE]/10">
             <div className="flex items-center gap-4 text-left">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FDE1E6] text-[#8B2E54]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-pink-200">
                 <ChefHat className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-extrabold text-base text-[#4A2B32]">
+                <h3 className="font-extrabold text-base text-white">
                   ¿Deseas algo personalizado? 🎂
                 </h3>
-                <p className="text-xs text-[#6F4A52] leading-relaxed mt-0.5 max-w-md">
+                <p className="text-xs text-pink-100/90 leading-relaxed mt-0.5 max-w-md">
                   Encarga pasteles de cumpleaños, decoraciones especiales o postres a tu medida directamente al repostero por WhatsApp.
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsCustomOrderOpen(true)}
-              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#B83E6C] px-5 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#8B2E54] transition active:scale-95 shadow-sm"
+              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-xs font-extrabold uppercase tracking-wider text-[#4A2B32] hover:bg-[#FFF6F6] transition active:scale-95 shadow-sm"
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-4 w-4 text-[#4A2B32]" />
               Encargar Pedido Especial
             </button>
           </div>
@@ -478,7 +493,7 @@ export default function CatalogoPage() {
                 const isOutOfStock = stock - cartQty <= 0;
 
                 return (
-                  <article key={producto.id} className="overflow-hidden rounded-xl border border-[#F2D6DE] bg-white shadow-sm flex flex-col justify-between">
+                  <article key={producto.id} className="group overflow-hidden rounded-xl border border-[#F2D6DE] bg-white shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <div>
                       <ProductPhoto producto={producto} />
                       <div className="p-4">
