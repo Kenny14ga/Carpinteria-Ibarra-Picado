@@ -277,7 +277,7 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
 
                   {/* Listado de items del pedido */}
                   <div className="rounded-xl bg-[#FFF9F5] border border-[#FDE1E6] p-2.5 space-y-1.5">
-                    {pedido.items.map((item) => (
+                    {Array.isArray(pedido.items) && pedido.items.map((item) => (
                       <div key={item.id} className="flex justify-between items-center text-xs">
                         <span className="text-[#6F4A52]">
                           <strong className="text-[#8B2E54]">{item.cantidad}x</strong> {item.nombre}

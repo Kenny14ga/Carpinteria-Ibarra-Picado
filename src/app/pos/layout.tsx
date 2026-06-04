@@ -130,8 +130,9 @@ function TopBar() {
   }, [isClosingShift, router]);
 
   return (
-    <header
-      id="pos-topbar"
+    <>
+      <header
+        id="pos-topbar"
       className="pos-topbar"
       style={{
         position: "fixed",
@@ -360,12 +361,14 @@ function TopBar() {
         </button>
       </div>
 
+      </header>
+
       <PedidosPendientes
         isOpen={isPedidosOpen}
         onClose={() => setIsPedidosOpen(false)}
         onPendingCountChange={setPendingCount}
       />
-    </header>
+    </>
   );
 }
 
@@ -375,6 +378,57 @@ export default function PosLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    const syncCatalog = async () => {
+      try {
+        console.log("[POS Layout] Sincronizando catálogo desde Supabase...");
+        const { data, error } = await supabase
+          .from("productos")
+          .select("*");
+
+        if (error) throw error;
+
+        if (data) {
+          // 1. Guardar productos en Dexie
+          await db.productos.clear();
+          await db.productos.bulkPut(
+            data.map((p: any) => ({
+              id: p.id,
+              nombre: p.nombre,
+              descripcion: p.descripcion || "",
+              precio_venta: p.precio_venta,
+              requiere_produccion: p.requiere_produccion || false,
+              es_terminado: p.es_terminado || false,
+              en_vitrina: p.en_vitrina || false,
+              stock_vitrina: p.stock_vitrina || 0,
+              alergenos: p.alergenos || [],
+              sync_status: "SYNCED"
+            }))
+          );
+
+          // 2. Guardar stock_vitrina en Dexie
+          const now = Date.now();
+          await db.stock_vitrina.clear();
+          await db.stock_vitrina.bulkPut(
+            data.map((p: any) => ({
+              producto_id: p.id,
+              cantidad: p.stock_vitrina || 0,
+              updated_at: now
+            }))
+          );
+
+          console.log("[POS Layout] Catálogo local sincronizado con éxito.");
+        }
+      } catch (err) {
+        console.error("[POS Layout] Error al sincronizar catálogo desde Supabase:", err);
+      }
+    };
+
+    if (navigator.onLine) {
+      syncCatalog();
+    }
+  }, []);
+
   return (
     <>
       <style>{`

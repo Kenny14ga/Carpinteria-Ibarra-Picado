@@ -269,7 +269,8 @@ export default function CatalogoPage() {
       setIsCartOpen(false);
     } catch (err) {
       console.error("[Checkout] Error al enviar pedido híbrido:", err);
-      alert("No pudimos registrar tu pedido. Revisa tu conexión a internet e inténtalo de nuevo.");
+      const errMsg = err instanceof Error ? err.message : JSON.stringify(err);
+      alert(`No pudimos registrar tu pedido. Detalle: ${errMsg}\n\nRevisa tu conexión a internet o la configuración del servidor e inténtalo de nuevo.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -354,7 +355,8 @@ export default function CatalogoPage() {
       setIsCustomOrderOpen(false);
     } catch (err) {
       console.error("[CustomOrder] Error al enviar pedido personalizado:", err);
-      alert("No pudimos registrar tu encargo. Revisa tu conexión a internet e inténtalo de nuevo.");
+      const errMsg = err instanceof Error ? err.message : JSON.stringify(err);
+      alert(`No pudimos registrar tu encargo. Detalle: ${errMsg}\n\nRevisa tu conexión a internet o la configuración del servidor e inténtalo de nuevo.`);
     } finally {
       setIsCustomSubmitting(false);
     }
