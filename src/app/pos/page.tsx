@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Producto } from "@/lib/db";
 import { usePosStore, type PosCartItem } from "@/store/usePosStore";
+import { TicketPDF } from "@/components/pos/TicketPDF";
 import {
   Store,
   Cake,
@@ -638,6 +639,20 @@ function TicketPanel() {
   const clearCart = usePosStore((s) => s.clearCart);
   const checkout = usePosStore((s) => s.checkout);
 
+  const [saleForReceipt, setSaleForReceipt] = useState<{
+    saleId: string;
+    items: {
+      productId: string;
+      name: string;
+      unitPrice: number;
+      quantity: number;
+      subtotal: number;
+    }[];
+    total: number;
+    timestamp: number;
+  } | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   const total = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0),
     [cartItems]
@@ -648,12 +663,98 @@ function TicketPanel() {
   );
 
   const handleCheckout = useCallback(async () => {
-    if (cartItems.length === 0) return;
-    const saleId = await checkout();
-    if (saleId) {
-      console.log("[POS] Venta registrada en cola de sincronización:", saleId);
+    if (cartItems.length === 0 || isCheckingOut || isGeneratingPDF) return;
+
+    // Guardar una copia temporal del carrito y el total para el recibo PDF
+    const itemsSnapshot = cartItems.map(item => ({ ...item }));
+    const totalSnapshot = total;
+    const timestampSnapshot = Date.now();
+
+    setIsGeneratingPDF(true);
+
+    try {
+      const saleId = await checkout();
+      if (saleId) {
+        console.log("[POS] Venta registrada en cola de sincronización:", saleId);
+        setSaleForReceipt({
+          saleId,
+          items: itemsSnapshot.map(item => ({
+            productId: item.productId,
+            name: item.name,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            subtotal: item.unitPrice * item.quantity
+          })),
+          total: totalSnapshot,
+          timestamp: timestampSnapshot
+        });
+      } else {
+        setIsGeneratingPDF(false);
+      }
+    } catch (err) {
+      console.error("[POS] Error al cobrar:", err);
+      setIsGeneratingPDF(false);
     }
-  }, [cartItems.length, checkout]);
+  }, [cartItems, isCheckingOut, isGeneratingPDF, total, checkout]);
+
+  useEffect(() => {
+    if (!saleForReceipt) return;
+    const currentSale = saleForReceipt;
+
+    async function processPDF() {
+      try {
+        // Esperar a que el DOM se actualice y renderice el div de forma asíncrona
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        
+        const element = document.getElementById("ticket-pdf");
+        if (!element) {
+          throw new Error("Elemento del ticket no encontrado en el DOM");
+        }
+
+        const html2canvas = (await import("html2canvas")).default;
+        const jsPDF = (await import("jspdf")).jsPDF;
+
+        const canvas = await html2canvas(element, {
+          scale: 2, // calidad 2x
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdfWidth = 80; // 80mm
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const pdfHeight = (imgHeight * pdfWidth) / imgWidth;
+
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: [pdfWidth, pdfHeight],
+        });
+
+        doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+        // Formato fecha legible para el nombre del archivo
+        const dateObj = new Date(currentSale.timestamp);
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        const hour = String(dateObj.getHours()).padStart(2, '0');
+        const minute = String(dateObj.getMinutes()).padStart(2, '0');
+        const fechaStr = `${day}-${month}-${year}_${hour}-${minute}`;
+
+        doc.save(`Recibo_Riquiquisimo_${fechaStr}.pdf`);
+      } catch (err) {
+        console.error("Error al generar o descargar el PDF:", err);
+      } finally {
+        setIsGeneratingPDF(false);
+        setSaleForReceipt(null); // Quitar del DOM
+      }
+    }
+
+    void processPDF();
+  }, [saleForReceipt]);
 
   return (
     <aside
@@ -1077,7 +1178,7 @@ function TicketPanel() {
           <button
             id="pos-cobrar-btn"
             type="button"
-            disabled={cartItems.length === 0 || isCheckingOut}
+            disabled={cartItems.length === 0 || isCheckingOut || isGeneratingPDF}
             onClick={handleCheckout}
             style={{
               width: "100%",
@@ -1085,11 +1186,11 @@ function TicketPanel() {
               borderRadius: "0.875rem",
               border: "none",
               background:
-                cartItems.length === 0 || isCheckingOut
+                cartItems.length === 0 || isCheckingOut || isGeneratingPDF
                   ? "var(--border-soft)"
                   : "linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%)",
               color:
-                cartItems.length === 0 || isCheckingOut
+                cartItems.length === 0 || isCheckingOut || isGeneratingPDF
                   ? "var(--cacao-muted)"
                   : "white",
               fontSize: "1.05rem",
@@ -1097,11 +1198,11 @@ function TicketPanel() {
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               cursor:
-                cartItems.length === 0 || isCheckingOut
+                cartItems.length === 0 || isCheckingOut || isGeneratingPDF
                   ? "not-allowed"
                   : "pointer",
               boxShadow:
-                cartItems.length === 0 || isCheckingOut
+                cartItems.length === 0 || isCheckingOut || isGeneratingPDF
                   ? "none"
                   : "0 4px 20px rgba(184, 62, 108, 0.35)",
               transition: "all 0.25s ease",
@@ -1112,7 +1213,7 @@ function TicketPanel() {
               WebkitTapHighlightColor: "transparent",
             }}
           >
-            {isCheckingOut ? (
+            {isCheckingOut || isGeneratingPDF ? (
               <svg
                 width="22"
                 height="22"
@@ -1143,10 +1244,13 @@ function TicketPanel() {
             )}
             {isCheckingOut
               ? "PROCESANDO…"
+              : isGeneratingPDF
+              ? "GENERANDO RECIBO…"
               : `COBRAR${cartItems.length > 0 ? ` — ${formatCurrency(total)}` : ""}`}
           </button>
         </div>
       </div>
+      {saleForReceipt && <TicketPDF data={saleForReceipt} />}
     </aside>
   );
 }
