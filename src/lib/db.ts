@@ -66,7 +66,7 @@ export function getSyncQueueStatus(item: SyncQueueItem): QueueStatus {
 
 export function isPendingSyncQueueItem(item: SyncQueueItem) {
   if (item.estado) {
-    return item.estado === "PENDING";
+    return item.estado === "PENDING" || item.estado === "FAILED";
   }
 
   return item.synced === false;
