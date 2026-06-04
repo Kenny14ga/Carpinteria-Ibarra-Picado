@@ -438,36 +438,42 @@ export default function CatalogoPage() {
           <img
             src="/LOGOS/logo-mark.svg"
             alt="Riquiquísimo Logo"
-            className="h-20 w-20 md:h-24 md:w-24 drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
+            className="w-32 md:w-48 h-auto drop-shadow-sm transition-transform duration-300 hover:scale-105 mb-4"
           />
-          <h2 className="font-cursive text-3xl md:text-5xl text-[#4A2B32] mt-2 select-none">
+          <h2 className="font-cursive text-4xl md:text-5xl text-[#4A2B32] mt-2 select-none">
             Postres con Cariño, sabor genuino
           </h2>
+          <a
+            href="#vitrina-productos"
+            className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-8 rounded-full shadow-md transition-all mt-6 inline-block"
+          >
+            Encarga desde nuestra vitrina ↓
+          </a>
         </section>
 
         {/* Listado de Productos */}
-        <section className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
+        <section id="vitrina-productos" className="mx-auto max-w-5xl px-4 py-5 sm:px-6 scroll-mt-20">
           
           {/* Banner de Pedido Especial al Repostero */}
-          <div className="mb-6 rounded-2xl bg-[#4A2B32] p-5 sm:p-6 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 border border-[#F2D6DE]/10">
+          <div className="mb-6 rounded-2xl bg-white p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-pink-200">
             <div className="flex items-center gap-4 text-left">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-pink-200">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-700">
                 <ChefHat className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-extrabold text-base text-white">
+                <h3 className="font-extrabold text-base text-gray-800">
                   ¿Deseas algo personalizado? 🎂
                 </h3>
-                <p className="text-xs text-pink-100/90 leading-relaxed mt-0.5 max-w-md">
+                <p className="text-xs text-gray-600 leading-relaxed mt-0.5 max-w-md">
                   Encarga pasteles de cumpleaños, decoraciones especiales o postres a tu medida directamente al repostero por WhatsApp.
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsCustomOrderOpen(true)}
-              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-xs font-extrabold uppercase tracking-wider text-[#4A2B32] hover:bg-[#FFF6F6] transition active:scale-95 shadow-sm"
+              className="w-full md:w-auto shrink-0 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-pink-600 hover:bg-pink-700 px-5 text-xs font-bold uppercase tracking-wider text-white transition active:scale-95 shadow-sm"
             >
-              <Sparkles className="h-4 w-4 text-[#4A2B32]" />
+              <Sparkles className="h-4 w-4 text-white" />
               Encargar Pedido Especial
             </button>
           </div>
@@ -493,7 +499,7 @@ export default function CatalogoPage() {
                 const isOutOfStock = stock - cartQty <= 0;
 
                 return (
-                  <article key={producto.id} className="group overflow-hidden rounded-xl border border-[#F2D6DE] bg-white shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <article key={producto.id} className="group overflow-hidden rounded-xl border border-[#F2D6DE] border-b-4 border-b-transparent bg-white shadow-sm flex flex-col justify-between transition-all duration-300 hover:border-b-pink-400 hover:shadow-2xl hover:shadow-pink-200/50 hover:-translate-y-1">
                     <div>
                       <ProductPhoto producto={producto} />
                       <div className="p-4">
