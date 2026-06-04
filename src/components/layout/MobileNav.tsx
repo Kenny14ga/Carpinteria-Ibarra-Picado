@@ -13,7 +13,8 @@ import {
   Package,
   Settings,
   Users,
-  X
+  X,
+  CircleDollarSign
 } from "lucide-react";
 import { logoutAction } from "@/app/auth/actions";
 
@@ -53,6 +54,7 @@ export function MobileNav() {
 
   const moreItems = [
     { label: "Reportes", href: "/admin/reportes", icon: BarChart3 },
+    { label: "Finanzas", href: "/admin/finanzas", icon: CircleDollarSign },
     { label: "Usuarios", href: "/admin/usuarios", icon: Users },
     { label: "Ajustes", href: "/admin/ajustes", icon: Settings }
   ];

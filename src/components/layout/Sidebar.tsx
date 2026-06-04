@@ -11,7 +11,8 @@ import {
   Package,
   Settings,
   Users,
-  LogOut
+  LogOut,
+  CircleDollarSign
 } from "lucide-react";
 import { logoutAction } from "@/app/auth/actions";
 
@@ -34,7 +35,8 @@ const sections: NavSection[] = [
       { label: "Inventario", href: "/admin/inventario", icon: Boxes },
       { label: "Productos", href: "/admin/productos", icon: Package },
       { label: "Recetas", href: "/admin/recetas", icon: ClipboardList },
-      { label: "Reportes", href: "/admin/reportes", icon: BarChart3 }
+      { label: "Reportes", href: "/admin/reportes", icon: BarChart3 },
+      { label: "Finanzas", href: "/admin/finanzas", icon: CircleDollarSign }
     ]
   },
   {
