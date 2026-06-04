@@ -7,6 +7,7 @@ import { logoutAction } from "@/app/auth/actions";
 import { db } from "@/lib/db";
 import { Bell } from "lucide-react";
 import { PedidosPendientes } from "@/components/pos/PedidosPendientes";
+import { SyncEngineRuntime } from "@/hooks/useSyncEngine";
 
 /* ─── TopBar: barra superior fija del POS ─── */
 function TopBar() {
@@ -431,6 +432,7 @@ export default function PosLayout({
           flexDirection: "column",
         }}
       >
+        <SyncEngineRuntime />
         <TopBar />
         <main
           id="pos-main"

@@ -12,28 +12,28 @@ export type Json =
 
 type TransaccionSyncTable = {
   Row: {
-    id: number;
-    accion: string;
+    id: string;
+    tipo_accion: string;
     payload: Json;
-    timestamp: string;
-    estado: QueueStatus;
-    created_at: string | null;
+    creado_en_cliente: string;
+    estado: string;
+    procesado_en_servidor: string;
   };
   Insert: {
-    id?: number;
-    accion: string;
+    id?: string;
+    tipo_accion: string;
     payload: Json;
-    timestamp: string;
-    estado: QueueStatus;
-    created_at?: string | null;
+    creado_en_cliente: string;
+    estado?: string;
+    procesado_en_servidor?: string;
   };
   Update: {
-    id?: number;
-    accion?: string;
+    id?: string;
+    tipo_accion?: string;
     payload?: Json;
-    timestamp?: string;
-    estado?: QueueStatus;
-    created_at?: string | null;
+    creado_en_cliente?: string;
+    estado?: string;
+    procesado_en_servidor?: string;
   };
   Relationships: [];
 };

@@ -51,15 +51,26 @@ function describeError(error: unknown) {
 }
 
 async function sendTransactionToSupabase(item: SyncQueueItem) {
-  const { error, status, statusText } = await supabase.from("transacciones_sync").insert({
-    accion: getSyncQueueAction(item),
+  const payload = {
+    tipo_accion: getSyncQueueAction(item),
     payload: serializePayload(item.payload),
-    timestamp: new Date(item.timestamp).toISOString(),
+    creado_en_cliente: new Date(item.timestamp).toISOString(),
     estado: getSyncQueueStatus(item)
-  });
+  };
 
-  if (error || !isSuccessfulStatus(status)) {
-    throw new Error(error?.message ?? `Supabase respondio ${status} ${statusText}`);
+  console.log("🚀 [Sync] Enviando payload: ", payload);
+
+  try {
+    const { error, status, statusText } = await supabase.from("transacciones_sync").insert(payload);
+
+    if (error || !isSuccessfulStatus(status)) {
+      const errObj = error || new Error(`Supabase respondio ${status} ${statusText}`);
+      console.error("❌ [Sync] Error de Supabase: ", errObj);
+      throw errObj;
+    }
+  } catch (err) {
+    console.error("❌ [Sync] Error de Supabase (excepcion): ", err);
+    throw err;
   }
 }
 
@@ -80,6 +91,8 @@ export function useSyncEngine(): SyncEngineState {
       return;
     }
 
+    console.log("🌐 [Sync] Conexión detectada. Iniciando...");
+
     if (!isSupabaseConfigured) {
       if (!warnedMissingConfigRef.current) {
         console.warn(
@@ -97,6 +110,8 @@ export function useSyncEngine(): SyncEngineState {
 
     try {
       const pendingItems = (await db.sync_queue.orderBy("timestamp").toArray()).filter(isPendingSyncQueueItem);
+
+      console.log(`📦 [Sync] Transacciones pendientes encontradas: ${pendingItems.length}`);
 
       for (const item of pendingItems) {
         if (!getOnlineStatus()) {
