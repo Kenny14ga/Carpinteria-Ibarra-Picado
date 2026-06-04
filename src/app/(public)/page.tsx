@@ -367,8 +367,7 @@ export default function CatalogoPage() {
   return (
     <main className="min-h-screen bg-[#FFF6F6] text-[#4A2B32] flex flex-col justify-between">
       <div className="flex-1">
-        {/* Cabecera pública */}
-        <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 border-b border-[#F2D6DE] bg-white/95 px-4 py-2 md:py-3 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -376,7 +375,7 @@ export default function CatalogoPage() {
                 <img
                   src="/LOGOS/logo-mark.svg"
                   alt="Riquiquísimo"
-                  className="h-11 w-11 shrink-0 rounded-lg shadow-sm"
+                  className="h-10 md:h-14 w-auto shrink-0 rounded-lg shadow-sm"
                 />
                 <span className="brand-heading text-2xl font-bold italic leading-none text-[#8B2E54]">
                   Riquiquísimo
