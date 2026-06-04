@@ -61,13 +61,21 @@ async function sendTransactionToSupabase(item: SyncQueueItem) {
   console.log("🚀 [Sync] Enviando payload: ", payload);
 
   try {
-    const { error, status, statusText } = await supabase.from("transacciones_sync").insert(payload);
+    const { data, error, status, statusText } = await supabase
+      .from("transacciones_sync")
+      .insert(payload)
+      .select();
 
     if (error || !isSuccessfulStatus(status)) {
       const errObj = error || new Error(`Supabase respondio ${status} ${statusText}`);
       console.error("❌ [Sync] Error de Supabase: ", errObj);
+      if (error?.details) {
+        console.error("❌ [Sync] Detalles del error: ", error.details);
+      }
       throw errObj;
     }
+
+    console.log("✅ [Sync] Inserción exitosa en Supabase:", data);
   } catch (err) {
     console.error("❌ [Sync] Error de Supabase (excepcion): ", err);
     throw err;
@@ -121,18 +129,19 @@ export function useSyncEngine(): SyncEngineState {
         }
 
         if (item.id === undefined) {
-          const message = "[SyncEngine] Registro de sync_queue sin id local. Se interrumpe el ciclo.";
+          const message = "[SyncEngine] Registro de sync_queue sin id local. Se omite esta transacción.";
           console.warn(message, item);
           setLastError(message);
-          break;
+          continue;
         }
 
         try {
           await sendTransactionToSupabase(item);
           await db.sync_queue.delete(item.id);
+          console.log(`🗑️ [Sync] Transacción ${item.id} eliminada con éxito de IndexedDB.`);
         } catch (error) {
           const message = describeError(error);
-          console.warn("[SyncEngine] Fallo al sincronizar. La cola queda detenida para mantener orden FIFO.", {
+          console.error("❌ [Sync] Fallo al sincronizar transacción individual:", {
             queueId: item.id,
             accion: getSyncQueueAction(item),
             error
@@ -140,7 +149,7 @@ export function useSyncEngine(): SyncEngineState {
 
           await db.sync_queue.update(item.id, { estado: "FAILED", synced: false });
           setLastError(message);
-          break;
+          // Tolerancia a fallos individuales: no hacemos break, dejamos que continúe con la siguiente.
         }
       }
     } finally {
