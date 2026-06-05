@@ -377,7 +377,7 @@ export default function CatalogoPage() {
                   alt="Riquiquísimo"
                   className="h-10 md:h-14 w-auto shrink-0 rounded-lg shadow-sm"
                 />
-                <span className="brand-heading text-2xl font-bold italic leading-none text-[#8B2E54]">
+                <span className="brand-heading hidden text-2xl font-bold italic leading-none text-[#8B2E54] md:inline">
                   Riquiquísimo
                 </span>
               </div>
