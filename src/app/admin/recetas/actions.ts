@@ -60,7 +60,7 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
     const nombre = readText(formData, "nombre");
 
     if (!nombre) {
-      throw new Error("El nombre de la receta es obligatorio.");
+      throw new Error("El nombre de la ficha es obligatorio.");
     }
 
     const recipeId = crypto.randomUUID();
@@ -84,7 +84,7 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
       throw new Error(error.message);
     }
 
-    // Insertar receta_insumos si se provee el json de ingredientes
+    // Insertar receta_insumos si se provee el JSON de materiales.
     const insumosJson = readText(formData, "insumos_json");
     if (insumosJson) {
       const insumos = JSON.parse(insumosJson) as Array<{
@@ -106,7 +106,7 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
 
         const { error: insumosError } = await supabase.from("receta_insumos").insert(insumosPayload);
         if (insumosError) {
-          throw new Error(`Receta creada, pero falló al guardar ingredientes: ${insumosError.message}`);
+          throw new Error(`Ficha creada, pero falló al guardar materiales: ${insumosError.message}`);
         }
       }
     }
@@ -114,9 +114,9 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
     revalidatePath("/admin/recetas");
     revalidatePath("/");
 
-    return { ok: true, message: "Receta creada correctamente." };
+    return { ok: true, message: "Ficha técnica creada correctamente." };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "No se pudo crear la receta." };
+    return { ok: false, message: error instanceof Error ? error.message : "No se pudo crear la ficha técnica." };
   }
 }
 
@@ -127,10 +127,10 @@ export async function updateRecetaAction(formData: FormData): Promise<RecetaActi
     const nombre = readText(formData, "nombre");
 
     if (!id) {
-      throw new Error("El ID de la receta es obligatorio.");
+      throw new Error("El ID de la ficha es obligatorio.");
     }
     if (!nombre) {
-      throw new Error("El nombre de la receta es obligatorio.");
+      throw new Error("El nombre de la ficha es obligatorio.");
     }
 
     const producto_id = readText(formData, "producto_id") || null;
@@ -173,15 +173,15 @@ export async function updateRecetaAction(formData: FormData): Promise<RecetaActi
 
     const result = data as { ok: boolean; message: string; costo_estimado?: number };
     if (!result.ok) {
-      throw new Error(result.message || "Error al actualizar la receta en la base de datos.");
+      throw new Error(result.message || "Error al actualizar la ficha en la base de datos.");
     }
 
     revalidatePath("/admin/recetas");
     revalidatePath("/");
 
-    return { ok: true, message: result.message || "Receta actualizada correctamente." };
+    return { ok: true, message: result.message || "Ficha técnica actualizada correctamente." };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "No se pudo actualizar la receta." };
+    return { ok: false, message: error instanceof Error ? error.message : "No se pudo actualizar la ficha técnica." };
   }
 }
 
@@ -190,7 +190,7 @@ export async function deleteRecetaAction(id: string): Promise<RecetaActionResult
     await assertAdminAccess();
 
     if (!id) {
-      throw new Error("El ID de la receta es obligatorio.");
+      throw new Error("El ID de la ficha es obligatorio.");
     }
 
     const supabase = await createSupabaseServerClient();
@@ -205,7 +205,7 @@ export async function deleteRecetaAction(id: string): Promise<RecetaActionResult
 
     const result = data as { ok: boolean; message: string; action: "ARCHIVED" | "DELETED" };
     if (!result.ok) {
-      throw new Error(result.message || "Error al eliminar la receta en la base de datos.");
+      throw new Error(result.message || "Error al eliminar la ficha en la base de datos.");
     }
 
     revalidatePath("/admin/recetas");
@@ -213,6 +213,6 @@ export async function deleteRecetaAction(id: string): Promise<RecetaActionResult
 
     return { ok: true, message: result.message };
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "No se pudo eliminar la receta." };
+    return { ok: false, message: error instanceof Error ? error.message : "No se pudo eliminar la ficha técnica." };
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, CheckCircle2, ChefHat, Plus, RefreshCw, Save, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Hammer, Plus, RefreshCw, Save, X } from "lucide-react";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 import { StatusBadge } from "@/components/admin/AdminSection";
 import type { ProduccionRow, RecetaRow, RecetaInsumoRow, MateriaPrimaRow } from "@/lib/supabase";
@@ -42,7 +42,7 @@ function Alert({ result }: { result: ProcesarProduccionActionResult | null }) {
       <Icon aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
       <span>
         {result.success
-          ? `Produccion procesada: ${result.data.unidades_producidas} unidades.`
+          ? `Fabricación procesada: ${result.data.unidades_producidas} unidades.`
           : result.error}
       </span>
     </div>
@@ -114,7 +114,7 @@ export function ProduccionClient({
 
     return {
       id: insumo.id,
-      nombre: mp?.nombre ?? "Insumo desconocido",
+      nombre: mp?.nombre ?? "Material desconocido",
       unidad: mp?.unidad_medida ?? "unidad",
       required,
       available,
@@ -125,9 +125,9 @@ export function ProduccionClient({
   const hasInsufficientStock = previewInsumos.some((insumo) => !insumo.isSufficient);
 
   const columns: Array<ResponsiveTableColumn<ProduccionRow>> = [
-    { key: "nombre", header: "Lote", cell: (row) => <span className="font-semibold">{row.nombre}</span> },
+    { key: "nombre", header: "Orden", cell: (row) => <span className="font-semibold">{row.nombre}</span> },
     { key: "fecha", header: "Fecha", className: "w-32", cell: (row) => row.fecha_programada || "-" },
-    { key: "lotes", header: "Lotes", className: "w-24", cell: (row) => row.lotes ?? 1 },
+    { key: "lotes", header: "Cantidad", className: "w-24", cell: (row) => row.lotes ?? 1 },
     { key: "plan", header: "Planificado", className: "w-32", cell: (row) => row.cantidad_planificada },
     { key: "terminado", header: "Terminado", className: "w-32", cell: (row) => row.cantidad_terminada ?? 0 },
     { key: "estado", header: "Estado", className: "w-36", cell: (row) => <StatusBadge label={statusLabel(row.estado)} tone={statusTone(row.estado)} /> }
@@ -137,8 +137,8 @@ export function ProduccionClient({
     <>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-[#4A2B32]">Lotes y hornadas</h2>
-          <p className="text-sm text-[#6F4A52]">{rows.length} movimientos de produccion</p>
+          <h2 className="text-base font-semibold text-[#4A2B32]">Órdenes y fabricación</h2>
+          <p className="text-sm text-[#6F4A52]">{rows.length} movimientos de taller</p>
         </div>
         <div className="w-full sm:w-96">
           <Alert result={alert} />
@@ -151,9 +151,9 @@ export function ProduccionClient({
         getRowKey={(row) => row.id}
         emptyState={
           <div>
-            <ChefHat aria-hidden="true" className="mx-auto h-10 w-10 text-[#F48CAA]" />
-            <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin produccion planificada</p>
-            <p className="mt-1 text-sm text-[#6F4A52]">Crea el primer lote para organizar cocina.</p>
+            <Hammer aria-hidden="true" className="mx-auto h-10 w-10 text-[#F48CAA]" />
+            <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin órdenes planificadas</p>
+            <p className="mt-1 text-sm text-[#6F4A52]">Crea la primera orden para organizar el taller.</p>
           </div>
         }
       />
@@ -164,7 +164,7 @@ export function ProduccionClient({
         className="btn-primary fixed bottom-24 right-4 z-30 inline-flex h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-soft lg:bottom-6"
       >
         <Plus aria-hidden="true" className="h-5 w-5" />
-        Planificar lote
+        Nueva orden
       </button>
 
       {isDrawerOpen ? (
@@ -173,8 +173,8 @@ export function ProduccionClient({
           <aside className="absolute inset-x-0 bottom-0 max-h-[92vh] overflow-y-auto rounded-t-md bg-white shadow-soft md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[30rem] md:max-h-none md:rounded-none">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-4 py-4">
               <div>
-                <h2 className="text-base font-semibold text-[#4A2B32]">Procesar produccion</h2>
-                <p className="text-sm text-[#6F4A52]">El inventario se actualiza de forma atomica en la base de datos.</p>
+                <h2 className="text-base font-semibold text-[#4A2B32]">Procesar fabricación</h2>
+                <p className="text-sm text-[#6F4A52]">El inventario se actualiza de forma atómica en la base de datos.</p>
               </div>
               <button type="button" title="Cerrar" onClick={closeDrawer} className="flex h-10 w-10 items-center justify-center rounded-md text-[#6F4A52] hover:bg-[#FFF9F5]">
                 <X aria-hidden="true" className="h-5 w-5" />
@@ -182,7 +182,7 @@ export function ProduccionClient({
             </div>
             <form onSubmit={handleSubmit} className="space-y-4 p-4">
               <label className="block">
-                <span className="text-sm font-medium text-[#4A2B32]">Receta</span>
+                <span className="text-sm font-medium text-[#4A2B32]">Ficha técnica</span>
                 <select
                   name="receta_id"
                   required
@@ -191,7 +191,7 @@ export function ProduccionClient({
                   className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm"
                   disabled={recetas.length === 0}
                 >
-                  <option value="">Seleccionar receta</option>
+                  <option value="">Seleccionar ficha</option>
                   {recetas.map((receta) => (
                     <option key={receta.id} value={receta.id}>
                       {receta.nombre}
@@ -201,7 +201,7 @@ export function ProduccionClient({
               </label>
               
               <label className="block">
-                <span className="text-sm font-medium text-[#4A2B32]">Lotes</span>
+                <span className="text-sm font-medium text-[#4A2B32]">Órdenes</span>
                 <input
                   name="lotes"
                   type="number"
@@ -223,7 +223,7 @@ export function ProduccionClient({
                     <table className="min-w-full divide-y divide-[var(--border-soft)]">
                       <thead className="bg-[var(--cream)] text-[var(--cacao-light)] font-semibold">
                         <tr>
-                          <th className="px-3 py-2 text-left text-[0.625rem] font-bold uppercase tracking-wider">Ingrediente</th>
+                          <th className="px-3 py-2 text-left text-[0.625rem] font-bold uppercase tracking-wider">Material</th>
                           <th className="px-3 py-2 text-right text-[0.625rem] font-bold uppercase tracking-wider">Requerido</th>
                           <th className="px-3 py-2 text-right text-[0.625rem] font-bold uppercase tracking-wider">Disponible</th>
                         </tr>
@@ -253,25 +253,25 @@ export function ProduccionClient({
                   {hasInsufficientStock ? (
                     <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-[var(--danger-bg)] p-2 text-[0.65rem] font-semibold text-[var(--danger)] leading-relaxed">
                       <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                      <span>Stock insuficiente para algunos ingredientes del lote. Ajusta la cantidad de lotes o reabastece materias primas.</span>
+                      <span>Stock insuficiente para algunos materiales. Ajusta la cantidad o reabastece inventario.</span>
                     </div>
                   ) : (
                     <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-[var(--success-bg)] p-2 text-[0.65rem] font-semibold text-[var(--success)] leading-relaxed">
                       <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                      <span>Stock suficiente disponible para todos los ingredientes.</span>
+                      <span>Stock suficiente disponible para todos los materiales.</span>
                     </div>
                   )}
                 </div>
               ) : selectedRecetaId ? (
                 <div className="mt-4 flex items-center gap-1.5 rounded-lg bg-amber-50 p-3 text-xs font-medium text-[#B7791F]">
                   <AlertCircle className="h-4 w-4 shrink-0 text-[#B7791F]" />
-                  <span>Esta receta no tiene ingredientes o insumos asociados en la base de datos.</span>
+                  <span>Esta ficha no tiene materiales asociados en la base de datos.</span>
                 </div>
               ) : null}
 
               {recetas.length === 0 ? (
                 <div className="rounded-md bg-amber-50 px-3 py-2 text-sm font-medium text-[#B7791F]">
-                  Primero crea una receta con producto terminado e insumos configurados.
+                  Primero crea una ficha técnica con producto terminado y materiales configurados.
                 </div>
               ) : null}
               
@@ -282,7 +282,7 @@ export function ProduccionClient({
                   className="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#D7A1B6]"
                 >
                   {isPending ? <RefreshCw aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Save aria-hidden="true" className="h-5 w-5" />}
-                  {isPending ? "Procesando" : "Procesar produccion"}
+                  {isPending ? "Procesando" : "Procesar fabricación"}
                 </button>
               </div>
             </form>

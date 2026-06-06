@@ -33,7 +33,7 @@ async function loadRecetas() {
       productos: [] as ProductoRow[],
       materiasPrimas: [] as MateriaPrimaRow[],
       recetaInsumos: [] as RecetaInsumoRow[],
-      error: error instanceof Error ? error.message : "No se pudieron cargar las recetas y catálogo."
+      error: error instanceof Error ? error.message : "No se pudieron cargar las fichas técnicas y el catálogo."
     };
   }
 }
@@ -43,9 +43,9 @@ export default async function RecetasPage() {
 
   return (
     <AdminSection
-      eyebrow="Estandarizacion"
-      title="Recetas"
-      description="Documenta rendimientos, costos y estados para producir con consistencia."
+      eyebrow="Estandarización técnica"
+      title="Fichas técnicas"
+      description="Documenta materiales, rendimientos, costos y pasos para fabricar con consistencia."
     >
       <RecetasClient
         rows={rows}

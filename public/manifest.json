@@ -1,28 +1,28 @@
 {
-  "name": "Riquiquísimo — Pastelería Artesanal",
-  "short_name": "Riquiquísimo",
-  "description": "Sistema operativo para inventario, producción y ventas de pastelería artesanal.",
+  "name": "Carpintería Ibarra Picado",
+  "short_name": "Ibarra Picado",
+  "description": "Sistema operativo para ventas, inventario, compras de madera, fabricación y cotizaciones de carpintería.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#FFF6F6",
-  "theme_color": "#B83E6C",
+  "background_color": "#F7F4EF",
+  "theme_color": "#4A2E20",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/LOGOS/favicon.svg",
+      "src": "/LOGOSCAP/favicon_512.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/LOGOS/icon-192.png",
+      "src": "/LOGOSCAP/pwa_icon_192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/LOGOS/icon-512.png",
+      "src": "/LOGOSCAP/pwa_icon_512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

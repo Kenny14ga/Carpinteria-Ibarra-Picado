@@ -33,13 +33,8 @@ function LoginForm() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-[#FFF6F6] p-4 text-[#4A2B32]">
-      {/* Background gradients for premium ambient lighting */}
-      <div className="absolute top-1/4 left-1/4 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--brand-pastel)]/40 blur-[100px]" />
-      <div className="absolute bottom-1/4 right-1/4 h-72 w-72 translate-x-1/2 translate-y-1/2 rounded-full bg-[var(--brand-cream)]/50 blur-[100px]" />
-
+    <main className="relative flex min-h-screen items-center justify-center bg-[var(--blush)] p-4 text-[var(--cacao)]">
       <div className="relative w-full max-w-md animate-fade-in">
-        {/* Back Link to Catalog */}
         <div className="mb-4">
           <Link
             href="/"
@@ -50,20 +45,19 @@ function LoginForm() {
           </Link>
         </div>
 
-        {/* Login Card */}
-        <div className="glass-card overflow-hidden rounded-2xl border border-[#F2D6DE] bg-white/70 p-6 shadow-[0_8px_32px_0_rgba(139,46,84,0.06)] backdrop-blur-md sm:p-8">
+        <div className="glass-card overflow-hidden rounded-2xl border border-[var(--border-soft)] bg-white/85 p-6 shadow-[var(--shadow-lg)] backdrop-blur-md sm:p-8">
           <div className="flex flex-col items-center text-center">
             <Image
-              src="/LOGOS/logo-mark.svg"
-              alt="Riquiquísimo"
+              src="/LOGOSCAP/simbolo_solo.svg"
+              alt="Carpintería Ibarra Picado"
               width={64}
               height={64}
               className="rounded-xl shadow-sm"
               priority
             />
-            <h1 className="brand-heading mt-4 text-2xl font-bold">Portal de Empleados</h1>
+            <h1 className="brand-heading mt-4 text-2xl font-bold">Portal de Taller</h1>
             <p className="mt-1 text-sm text-[var(--cacao-light)]">
-              Inicia sesión para acceder a la caja o administración.
+              Inicia sesión para gestionar ventas, madera, compras y fabricación.
             </p>
           </div>
 
@@ -88,7 +82,7 @@ function LoginForm() {
                   name="email"
                   type="email"
                   required
-                  placeholder="ejemplo@riquiquisimo.com"
+                  placeholder="usuario@ibarrapicado.com"
                   autoComplete="email"
                   className="field-control h-11 w-full rounded-lg pl-9 pr-3 text-sm placeholder:text-[var(--cacao-muted)]"
                 />
@@ -135,7 +129,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="relative flex min-h-screen items-center justify-center bg-[#FFF6F6] p-4 text-[#4A2B32]">
+      <main className="relative flex min-h-screen items-center justify-center bg-[var(--blush)] p-4 text-[var(--cacao)]">
         <RefreshCw aria-hidden="true" className="h-8 w-8 animate-spin text-[var(--brand)]" />
       </main>
     }>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Carpintería Ibarra Picado">
+  <defs>
+    <linearGradient id="woodGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E6D3B1"/>
+      <stop offset="45%" stop-color="#C89A5B"/>
+      <stop offset="100%" stop-color="#8B5E34"/>
+    </linearGradient>
+    <linearGradient id="darkWood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A2E20"/>
+      <stop offset="100%" stop-color="#8B5E34"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.20"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="#4A2E20"/>
+  <rect x="30" y="30" width="452" height="452" rx="90" fill="url(#darkWood)" opacity="0.86"/>
+  
+  <g transform="translate(119,104) scale(1.25)">
+    <path d="M110 14 L196 58 L196 174 L110 218 L24 174 L24 58 Z" fill="none" stroke="#4A2E20" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M48 70 L104 38 L104 196 L48 165 Z" fill="#E6D3B1" opacity="0.95"/>
+    <path d="M116 40 L174 70 L174 166 L116 196 Z" fill="#8B5E34" opacity="0.98"/>
+    <path d="M128 78 L160 94 L160 119 L128 105 Z" fill="#C89A5B" opacity="0.9"/>
+    <path d="M128 126 L160 139 L160 162 L128 150 Z" fill="#C89A5B" opacity="0.9"/>
+    <rect x="132" y="92" width="30" height="5" rx="2.5" fill="#F7F4EF" opacity="0.9"/>
+    <rect x="132" y="143" width="30" height="5" rx="2.5" fill="#F7F4EF" opacity="0.9"/>
+    <path d="M47 70 L104 38 L104 196 L47 165 Z" fill="none" stroke="#4A2E20" stroke-width="5" opacity="0.45"/>
+    <path d="M116 40 L174 70 L174 166 L116 196 Z" fill="none" stroke="#4A2E20" stroke-width="5" opacity="0.45"/>
+    <path d="M38 59 L110 22 L185 60" fill="none" stroke="#E6D3B1" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

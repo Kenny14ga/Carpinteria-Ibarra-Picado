@@ -28,7 +28,7 @@ function readPositiveInteger(formData: FormData, key: string) {
   const value = Number(readText(formData, key));
 
   if (!Number.isInteger(value) || value <= 0) {
-    throw new Error("La cantidad de lotes debe ser un numero entero mayor que cero.");
+    throw new Error("La cantidad de órdenes debe ser un número entero mayor que cero.");
   }
 
   return value;
@@ -39,7 +39,7 @@ function formatRpcError(error: unknown) {
     return error.message;
   }
 
-  return "No se pudo procesar la produccion.";
+  return "No se pudo procesar la fabricación.";
 }
 
 export async function procesarProduccionAction(formData: FormData): Promise<ProcesarProduccionActionResult> {
@@ -47,7 +47,7 @@ export async function procesarProduccionAction(formData: FormData): Promise<Proc
     const recetaId = readText(formData, "receta_id");
 
     if (!recetaId) {
-      throw new Error("Debe seleccionar una receta.");
+      throw new Error("Debe seleccionar una ficha técnica.");
     }
 
     const lotes = readPositiveInteger(formData, "lotes");
@@ -59,7 +59,7 @@ export async function procesarProduccionAction(formData: FormData): Promise<Proc
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      throw new Error(userError?.message ?? "Debe iniciar sesion para procesar produccion.");
+      throw new Error(userError?.message ?? "Debe iniciar sesión para procesar fabricación.");
     }
 
     const usuarioId = readText(formData, "usuario_id") || user.id;

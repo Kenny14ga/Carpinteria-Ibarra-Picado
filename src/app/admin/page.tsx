@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, BarChart3, Boxes, ChefHat, ClipboardList, Package, ShoppingBag } from "lucide-react";
+import { AlertTriangle, BarChart3, Boxes, ClipboardList, Hammer, Package, ShoppingBag } from "lucide-react";
 import { AdminSection, MetricCard, StatusBadge } from "@/components/admin/AdminSection";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { MateriaPrimaRow, ProductoRow, ProduccionRow, RecetaRow } from "@/lib/supabase";
@@ -58,16 +58,16 @@ export default async function DashboardPage() {
 
   return (
     <AdminSection
-      eyebrow="¡Hola, Repostera! ✨"
+      eyebrow="Operación de carpintería"
       title="Panel de Control"
-      description="¿Lista para la jornada de hoy? Revisa alertas de inventario, planifica tus lotes de producción y analiza los costos."
+      description="Revisa inventario de madera y herrajes, órdenes de taller, costos y productos disponibles para venta."
       action={
         <Link
           href="/admin/materias-primas"
           className="btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition"
         >
           <ShoppingBag aria-hidden className="h-4 w-4" />
-          Registrar insumo
+          Registrar material
         </Link>
       }
     >
@@ -83,39 +83,39 @@ export default async function DashboardPage() {
         <MetricCard
           label="Productos activos"
           value={String(productos.length)}
-          helper="Terminados, en vitrina y catálogo."
+          helper="Puertas, muebles, herrajes y piezas listas."
           icon={<Package aria-hidden className="h-5 w-5" />}
         />
         <MetricCard
-          label="Ingredientes por vencer"
+          label="Materiales por revisar"
           value={String(expiring.length)}
           tone={expiring.length > 0 ? "warning" : "success"}
-          helper="Prioridad para producción o compra."
+          helper="Lotes con fecha próxima de revisión."
           icon={<AlertTriangle aria-hidden className="h-5 w-5" />}
         />
         <MetricCard
           label="Stock bajo"
           value={String(lowStock.length)}
           tone={lowStock.length > 0 ? "warning" : "success"}
-          helper="Reposición sugerida antes de vender."
+          helper="Reposición sugerida antes de cotizar."
           icon={<Boxes aria-hidden className="h-5 w-5" />}
         />
         <MetricCard
-          label="Recetas documentadas"
+          label="Fichas técnicas"
           value={String(recetas.length)}
           icon={<ClipboardList aria-hidden className="h-5 w-5" />}
         />
         <MetricCard
-          label="Lotes en producción"
+          label="Órdenes de taller"
           value={String(planned.length)}
           tone="info"
-          icon={<ChefHat aria-hidden className="h-5 w-5" />}
+          icon={<Hammer aria-hidden className="h-5 w-5" />}
         />
         <MetricCard
           label="Costo inventario"
           value={`C$ ${costTotal.toFixed(2)}`}
           tone="brand"
-          helper="Costo estimado de insumos actuales."
+          helper="Costo estimado de materiales actuales."
           icon={<BarChart3 aria-hidden className="h-5 w-5" />}
         />
       </div>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <StatusBadge
-                    label={isExpiringSoon(item) ? "Por vencer" : "Stock bajo"}
+                    label={isExpiringSoon(item) ? "Revisar lote" : "Stock bajo"}
                     tone="warning"
                   />
                 </div>
@@ -160,9 +160,9 @@ export default async function DashboardPage() {
 
         <section className="animate-fade-in surface-card rounded-xl p-5" style={{ animationDelay: "300ms" }}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-bold text-[var(--cacao)]">Producción activa</h2>
+            <h2 className="text-base font-bold text-[var(--cacao)]">Taller activo</h2>
             <Link
-              href="/admin/recetas"
+              href="/admin/produccion"
               className="text-sm font-semibold text-[var(--brand)] transition-colors hover:text-[var(--brand-dark)]"
             >
               Ver tablero
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
             ))}
             {planned.length === 0 ? (
               <p className="rounded-lg bg-[var(--cream)] p-4 text-sm text-[var(--cacao-light)]">
-                No hay lotes pendientes.
+                No hay órdenes pendientes en taller.
               </p>
             ) : null}
           </div>

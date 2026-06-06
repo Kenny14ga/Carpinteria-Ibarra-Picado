@@ -2,24 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Brand tokens from Riquiquísimo logos ─── */
+/* Brand tokens from Carpinteria Ibarra Picado assets */
 :root {
   color-scheme: light;
 
-  /* Primary palette (from logo SVGs) */
-  --blush: #fff6f6;
+  /* Primary palette (from LOGOSCAP) */
+  --blush: #f7f4ef;
   --card: #ffffff;
-  --brand-pastel: #f48caa;
-  --brand-cream: #fde1e6;
-  --brand: #b83e6c;
-  --brand-dark: #8b2e54;
-  --brand-deepest: #6b1d3f;
-  --cacao: #4a2b32;
-  --cacao-light: #6f4a52;
-  --cacao-muted: #8a6c72;
-  --border-soft: #f2d6de;
-  --border-hover: #f48caa;
-  --cream: #fff9f5;
+  --brand-pastel: #c89a5b;
+  --brand-cream: #e6d3b1;
+  --brand: #8b5e34;
+  --brand-dark: #4a2e20;
+  --brand-deepest: #2f1b12;
+  --cacao: #2f2119;
+  --cacao-light: #5f4636;
+  --cacao-muted: #8a705f;
+  --border-soft: #ded0bb;
+  --border-hover: #c89a5b;
+  --cream: #fbf8f1;
+  --accent: #2f6f67;
+  --accent-bg: rgba(47, 111, 103, 0.1);
 
   /* Semantic */
   --success: #16a34a;
@@ -33,14 +35,14 @@
 
   /* Surfaces */
   --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(242, 214, 222, 0.5);
+  --glass-border: rgba(222, 208, 187, 0.55);
 
   /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(74, 43, 50, 0.05);
-  --shadow-sm: 0 2px 8px rgba(74, 43, 50, 0.06);
-  --shadow-md: 0 8px 24px rgba(74, 43, 50, 0.08);
-  --shadow-lg: 0 16px 48px rgba(74, 43, 50, 0.1);
-  --shadow-xl: 0 24px 64px rgba(74, 43, 50, 0.14);
+  --shadow-xs: 0 1px 2px rgba(47, 33, 25, 0.05);
+  --shadow-sm: 0 2px 8px rgba(47, 33, 25, 0.07);
+  --shadow-md: 0 8px 24px rgba(47, 33, 25, 0.1);
+  --shadow-lg: 0 16px 48px rgba(47, 33, 25, 0.12);
+  --shadow-xl: 0 24px 64px rgba(47, 33, 25, 0.16);
 
   /* Layout */
   --sidebar-width: 17rem;
@@ -88,7 +90,7 @@ a {
 .app-page {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(253, 225, 230, 0.35) 0%, rgba(255, 246, 246, 0) 20rem),
+    linear-gradient(180deg, rgba(230, 211, 177, 0.4) 0%, rgba(247, 244, 239, 0) 20rem),
     var(--blush);
   color: var(--cacao);
 }
@@ -124,19 +126,19 @@ a {
 .btn-primary {
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(184, 62, 108, 0.25);
+  box-shadow: 0 2px 8px rgba(139, 94, 52, 0.25);
   transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-deepest) 100%);
-  box-shadow: 0 4px 16px rgba(184, 62, 108, 0.35);
+  box-shadow: 0 4px 16px rgba(74, 46, 32, 0.32);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(184, 62, 108, 0.2);
+  box-shadow: 0 1px 4px rgba(139, 94, 52, 0.2);
 }
 
 .btn-secondary {
@@ -162,7 +164,7 @@ a {
 
 .field-control:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(184, 62, 108, 0.12);
+  box-shadow: 0 0 0 3px rgba(139, 94, 52, 0.14);
   outline: none;
 }
 

@@ -168,14 +168,14 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
       return;
     }
     if (detalles.length === 0) {
-      setAlert({ ok: false, message: "Debe agregar al menos un insumo al detalle." });
+      setAlert({ ok: false, message: "Debe agregar al menos un material al detalle." });
       return;
     }
 
     // Validar ítems
     for (const item of detalles) {
       if (!item.materia_prima_id) {
-        setAlert({ ok: false, message: "Debe seleccionar un ingrediente en cada fila del detalle." });
+        setAlert({ ok: false, message: "Debe seleccionar un material en cada fila del detalle." });
         return;
       }
       if (item.cantidad <= 0) {
@@ -229,7 +229,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-[#8B2E54]">Abastecimiento de ingredientes</p>
+            <p className="text-sm font-medium text-[#8B2E54]">Abastecimiento de materiales</p>
             <h1 className="brand-heading mt-1 text-3xl font-semibold">Registro de compras</h1>
           </div>
           <button
@@ -268,7 +268,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
             <div className="animate-fade-in rounded-xl border border-dashed border-[var(--border-soft)] bg-white px-4 py-14 text-center">
               <ShoppingBag className="mx-auto h-10 w-10 text-[#F48CAA]" />
               <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin registros de compra</p>
-              <p className="mt-1 text-sm text-[#6F4A52]">Comienza a registrar compras para abastecer las materias primas.</p>
+              <p className="mt-1 text-sm text-[#6F4A52]">Comienza a registrar compras para abastecer madera, herrajes y consumibles.</p>
             </div>
           ) : (
             <div className="animate-fade-in space-y-4">
@@ -287,7 +287,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                         Proveedor
                       </th>
                       <th scope="col" className="px-4 py-3 text-left text-[0.65rem] font-bold uppercase tracking-wider text-[var(--brand)]">
-                        Detalle de Insumos
+                        Detalle de materiales
                       </th>
                       <th scope="col" className="px-4 py-3 text-right text-[0.65rem] font-bold uppercase tracking-wider text-[var(--brand)] w-36">
                         Monto Total
@@ -301,7 +301,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                     {purchases.map((row) => {
                       const isExpanded = expandedPurchaseId === row.id;
                       const names = row.compra_detalles
-                        .map((d: CompraDetalleRow) => d.materias_primas?.nombre || "Insumo desconocido")
+                        .map((d: CompraDetalleRow) => d.materias_primas?.nombre || "Material desconocido")
                         .join(", ");
 
                       return (
@@ -338,16 +338,16 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                             <tr className="bg-[#FFF9F5]/40">
                               <td colSpan={6} className="border-t border-[#F2D6DE] p-4">
                                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#8B2E54] mb-3">
-                                  Desglose de Factura
+                                  Desglose de factura
                                 </h4>
                                 <div className="overflow-x-auto rounded-lg border border-[#F2D6DE] bg-white">
                                   <table className="min-w-full divide-y divide-[#F2D6DE] text-xs">
                                     <thead className="bg-[#FFF6F6] font-bold text-[#4A2B32]">
                                       <tr>
-                                        <th className="px-4 py-2 text-left">Ingrediente</th>
+                                        <th className="px-4 py-2 text-left">Material</th>
                                         <th className="px-4 py-2 text-right">Cantidad</th>
                                         <th className="px-4 py-2 text-right">Costo Unitario</th>
-                                        <th className="px-4 py-2 text-right">Vencimiento</th>
+                                        <th className="px-4 py-2 text-right">Fecha lote</th>
                                         <th className="px-4 py-2 text-right">Subtotal</th>
                                       </tr>
                                     </thead>
@@ -355,7 +355,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                                       {row.compra_detalles.map((d: CompraDetalleRow) => (
                                         <tr key={d.id} className="hover:bg-[#FFF9F5]/30">
                                           <td className="px-4 py-2 font-semibold text-[#4A2B32]">
-                                            {d.materias_primas?.nombre || "Insumo desconocido"}
+                                            {d.materias_primas?.nombre || "Material desconocido"}
                                           </td>
                                           <td className="px-4 py-2 text-right">
                                             {d.cantidad} {d.materias_primas?.unidad_medida || "ud"}
@@ -385,7 +385,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                 {purchases.map((row) => {
                   const isExpanded = expandedPurchaseId === row.id;
                   const names = row.compra_detalles
-                    .map((d: CompraDetalleRow) => d.materias_primas?.nombre || "Insumo desconocido")
+                    .map((d: CompraDetalleRow) => d.materias_primas?.nombre || "Material desconocido")
                     .join(", ");
 
                   return (
@@ -411,7 +411,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                         </div>
                         <div className="grid gap-0.5">
                           <dt className="text-[0.65rem] font-bold uppercase tracking-wider text-[var(--brand)]">
-                            Detalle de Insumos
+                            Detalle de materiales
                           </dt>
                           <dd className="text-sm text-[var(--cacao)]">{names}</dd>
                         </div>
@@ -445,13 +445,13 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                       {isExpanded && (
                         <div className="mt-4 border-t border-[#F2D6DE] pt-3 space-y-3">
                           <h4 className="text-xs font-bold uppercase tracking-wider text-[#8B2E54]">
-                            Desglose de Factura
+                            Desglose de factura
                           </h4>
                           <div className="space-y-2.5">
                             {row.compra_detalles.map((d: CompraDetalleRow) => (
                               <div key={d.id} className="rounded-lg border border-[#F2D6DE] bg-[#FFF9F5]/30 p-2.5 text-xs text-[#6F4A52] space-y-1">
                                 <div className="flex justify-between font-semibold text-[#4A2B32]">
-                                  <span>{d.materias_primas?.nombre || "Insumo desconocido"}</span>
+                                  <span>{d.materias_primas?.nombre || "Material desconocido"}</span>
                                   <span>{formatCurrency(d.cantidad * d.costo_unitario)}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px] text-[#8A6C72]">
@@ -462,7 +462,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                                 </div>
                                 {d.fecha_vencimiento && (
                                   <div className="text-[10px] text-[#8A6C72] pt-0.5 border-t border-dashed border-[#F2D6DE]/60">
-                                    Vence: {formatDate(d.fecha_vencimiento)}
+                                    Fecha lote: {formatDate(d.fecha_vencimiento)}
                                   </div>
                                 )}
                               </div>
@@ -485,9 +485,9 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
           <aside className="w-full max-w-2xl h-full bg-[#FFF9F5] shadow-2xl flex flex-col animate-fade-in-left">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-5 py-4">
               <div>
-                <h2 className="text-lg font-bold text-[#4A2B32]">Registrar compra e insumos</h2>
+                <h2 className="text-lg font-bold text-[#4A2B32]">Registrar compra de materiales</h2>
                 <p className="text-xs text-[#6F4A52]">
-                  Esta acción incrementa el stock de inventario y recalcula el costo ponderado (CMP) en tiempo real.
+                  Esta acción incrementa el stock y recalcula el costo ponderado (CMP) en tiempo real.
                 </p>
               </div>
               <button
@@ -524,7 +524,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                     <input
                       type="text"
                       required
-                      placeholder="Ej. Lacteos del Norte"
+                      placeholder="Ej. Maderas San José"
                       value={proveedor}
                       onChange={(e) => setProveedor(e.target.value)}
                       className="field-control mt-1 h-11 w-full rounded-lg px-3 text-sm"
@@ -563,14 +563,14 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="text-sm font-bold text-[#4A2B32] flex items-center gap-1">
-                      <Layers className="h-4 w-4 text-[#8B2E54]" /> Detalle de Insumos Facturados
+                      <Layers className="h-4 w-4 text-[#8B2E54]" /> Detalle de materiales facturados
                     </h3>
                     <button
                       type="button"
                       onClick={addDetailRow}
                       className="inline-flex items-center gap-1 rounded-lg border border-[#F2D6DE] bg-white px-3 py-1.5 text-xs font-bold text-[#6F4A52] hover:bg-[#FFF9F5] hover:text-[#B83E6C] transition-colors"
                     >
-                      <Plus className="h-4.5 w-4.5" /> Agregar ingrediente
+                      <Plus className="h-4.5 w-4.5" /> Agregar material
                     </button>
                   </div>
 
@@ -581,14 +581,14 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                     >
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <label className="block">
-                          <span className="text-xs font-semibold text-[#6F4A52]">Ingrediente</span>
+                          <span className="text-xs font-semibold text-[#6F4A52]">Material</span>
                           <select
                             required
                             value={row.materia_prima_id}
                             onChange={(e) => handleDetailChange(index, "materia_prima_id", e.target.value)}
                             className="field-control mt-1 h-11 w-full rounded-lg px-3 text-sm"
                           >
-                            <option value="">Seleccionar ingrediente...</option>
+                            <option value="">Seleccionar material...</option>
                             {rawMaterials.map((mp) => (
                               <option key={mp.id} value={mp.id}>
                                 {mp.nombre} ({mp.unidad_medida})
@@ -597,7 +597,7 @@ export function ComprasClient({ purchases, rawMaterials, initialError }: Compras
                           </select>
                         </label>
                         <label className="block">
-                          <span className="text-xs font-semibold text-[#6F4A52]">Fecha Vencimiento (Lote)</span>
+                          <span className="text-xs font-semibold text-[#6F4A52]">Fecha de lote/revisión</span>
                           <input
                             type="date"
                             value={row.fecha_vencimiento || ""}

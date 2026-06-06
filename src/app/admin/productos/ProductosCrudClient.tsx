@@ -243,8 +243,8 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
     if (typeof window === "undefined") return;
 
     const catalogUrl = `${window.location.origin}/catalogo?q=${encodeURIComponent(product.nombre)}`;
-    const title = `Riquiquísimo - ${product.nombre}`;
-    const text = `¡Mira nuestro delicioso producto: ${product.nombre}! Recién horneado y disponible hoy en Riquiquísimo. 🎂✨`;
+    const title = `Carpintería Ibarra Picado - ${product.nombre}`;
+    const text = `Producto disponible para cotizar en Carpintería Ibarra Picado: ${product.nombre}.`;
 
     if (navigator.share) {
       navigator.share({
@@ -299,7 +299,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
     },
     {
       key: "estado",
-      header: "Vitrina",
+      header: "Catálogo",
       className: "w-32",
       cell: (product) => (
         <span
@@ -359,7 +359,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
       <header className="app-header px-4 py-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-[#8B2E54]">Catalogo de venta</p>
+            <p className="text-sm font-medium text-[#8B2E54]">Catálogo de carpintería</p>
             <h1 className="brand-heading mt-1 text-3xl font-semibold">Productos</h1>
           </div>
           <button
@@ -376,7 +376,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
       <section className="px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-base font-semibold text-[#4A2B32]">Catalogo operativo</h2>
+            <h2 className="text-base font-semibold text-[#4A2B32]">Catálogo operativo</h2>
             <p className="text-sm text-[#6F4A52]">{products.length} productos registrados</p>
           </div>
           <div className="w-full sm:w-80">
@@ -392,7 +392,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
             <div>
               <ImageIcon aria-hidden="true" className="mx-auto h-10 w-10 text-[#F48CAA]" />
               <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin productos</p>
-              <p className="mt-1 text-sm text-[#6F4A52]">Crea el primer producto para vitrina, POS y catalogo.</p>
+              <p className="mt-1 text-sm text-[#6F4A52]">Crea el primer producto para POS, catálogo y cotizaciones.</p>
             </div>
           }
           renderMobileCard={(product) => (
@@ -479,7 +479,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
                 <h2 className="text-base font-semibold text-[#4A2B32]">
                   {drawerMode === "edit" ? "Editar producto" : "Nuevo producto"}
                 </h2>
-                <p className="text-sm text-[#6F4A52]">Datos listos para catalogo, vitrina y POS.</p>
+                <p className="text-sm text-[#6F4A52]">Datos listos para catálogo, POS y cotizaciones.</p>
               </div>
               <button
                 type="button"
@@ -612,10 +612,10 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
               </div>
 
               <label className="block">
-                <span className="text-sm font-medium text-[#4A2B32]">Alergenos</span>
+                <span className="text-sm font-medium text-[#4A2B32]">Etiquetas de material/acabado</span>
                 <input
                   name="alergenos"
-                  placeholder="Gluten, leche, huevo"
+                  placeholder="Cedro, barniz natural, incluye instalación"
                   defaultValue={selectedProduct ? formatAllergens(selectedProduct) : ""}
                   className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm placeholder:text-[#B58B96]"
                 />
@@ -623,7 +623,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
 
               <div className="grid gap-3 rounded-md bg-[#FFF9F5] p-3">
                 <label className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-[#4A2B32]">Visible en vitrina</span>
+                  <span className="text-sm font-medium text-[#4A2B32]">Visible en catálogo</span>
                   <input
                     name="en_vitrina"
                     type="checkbox"
@@ -632,7 +632,7 @@ export function ProductosCrudClient({ products, initialError }: ProductosCrudCli
                   />
                 </label>
                 <label className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-[#4A2B32]">Requiere produccion</span>
+                  <span className="text-sm font-medium text-[#4A2B32]">Requiere fabricación</span>
                   <input
                     name="requiere_produccion"
                     type="checkbox"

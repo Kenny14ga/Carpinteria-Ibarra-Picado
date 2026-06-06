@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Save,
   X,
-  ChefHat,
+  Hammer,
   Trash2,
   Eye,
   Info,
@@ -84,10 +84,10 @@ export function RecetasClient({
     error ? { ok: false, message: error } : null
   );
 
-  // Estado para ingredientes dinámicos en el formulario de creación
+  // Estado para materiales dinámicos en el formulario de creación
   const [insumosList, setInsumosList] = useState<TempInsumo[]>([]);
 
-  // Estados para el modo de edición de la receta seleccionada
+  // Estados para el modo de edición de la ficha seleccionada
   const [isEditing, setIsEditing] = useState(false);
   const [editNombre, setEditNombre] = useState("");
   const [editProductoId, setEditProductoId] = useState("");
@@ -221,21 +221,21 @@ export function RecetasClient({
     <>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-[#4A2B32]">Recetario Técnico</h2>
-          <p className="text-sm text-[#6F4A52]">{rows.length} recetas de repostería documentadas</p>
+          <h2 className="text-base font-semibold text-[#4A2B32]">Fichas de fabricación</h2>
+          <p className="text-sm text-[#6F4A52]">{rows.length} fichas técnicas documentadas</p>
         </div>
         <div className="w-full sm:w-96">
           <Alert result={alert} />
         </div>
       </div>
 
-      {/* Grid de Fichas de Recetas */}
+      {/* Grid de fichas técnicas */}
       {rows.length === 0 ? (
         <div className="surface-card text-center py-12 rounded-xl border border-[var(--border-soft)]">
           <ClipboardList aria-hidden="true" className="mx-auto h-12 w-12 text-[#F48CAA]" />
-          <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin recetas registradas</p>
+          <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin fichas registradas</p>
           <p className="mt-1 text-sm text-[#6F4A52]">
-            Agrega tu primera receta técnica para organizar el inventario y guiar a tu personal.
+            Agrega tu primera ficha técnica para estandarizar materiales, costos y pasos de fabricación.
           </p>
         </div>
       ) : (
@@ -307,17 +307,17 @@ export function RecetasClient({
         </div>
       )}
 
-      {/* Botón Flotante para Crear Receta */}
+      {/* Botón flotante para crear ficha */}
       <button
         type="button"
         onClick={handleOpenCreateDrawer}
         className="btn-primary fixed bottom-24 right-4 z-30 inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6"
       >
         <Plus aria-hidden="true" className="h-5 w-5" />
-        Nueva receta
+        Nueva ficha
       </button>
 
-      {/* DETALLE DE RECETA (Ficha Técnica) */}
+      {/* DETALLE DE FICHA (Ficha Técnica) */}
       {selectedRecipe ? (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop */}
@@ -335,8 +335,8 @@ export function RecetasClient({
                 {/* Header del Formulario de Edición */}
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-5 py-4">
                   <div>
-                    <h3 className="text-base font-bold text-[#4A2B32]">Editar Ficha Técnica</h3>
-                    <p className="text-xs text-[#6F4A52]">Modifica los insumos, rendimiento e instrucciones.</p>
+                    <h3 className="text-base font-bold text-[#4A2B32]">Editar ficha técnica</h3>
+                    <p className="text-xs text-[#6F4A52]">Modifica materiales, rendimiento e instrucciones.</p>
                   </div>
                   <button
                     type="button"
@@ -350,17 +350,17 @@ export function RecetasClient({
                 {/* Formulario de Edición */}
                 <form onSubmit={handleEditSubmit} className="flex flex-1 flex-col overflow-hidden">
                   <div className="flex-1 overflow-y-auto p-5 space-y-4">
-                    {/* Nombre de la Receta */}
+                    {/* Nombre de la ficha */}
                     <label className="block">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                        Nombre de la Receta
+                        Nombre de la ficha
                       </span>
                       <input
                         name="nombre"
                         required
                         value={editNombre}
                         onChange={(e) => setEditNombre(e.target.value)}
-                        placeholder="Ej. Pastel de Tres Leches Tradicional"
+                        placeholder="Ej. Puerta sólida de cedro 90 x 210"
                         className="field-control mt-1.5 h-11 w-full rounded-lg px-3 text-xs font-semibold"
                       />
                     </label>
@@ -405,7 +405,7 @@ export function RecetasClient({
                       {/* Nota sobre costo */}
                       <div className="flex flex-col justify-end pb-1.5">
                         <span className="text-[10px] italic text-[#6F4A52]">
-                          * El costo estimado se recalcula automáticamente sumando la materia prima de los insumos.
+                          * El costo estimado se recalcula automáticamente sumando los materiales configurados.
                         </span>
                       </div>
                     </div>
@@ -423,7 +423,7 @@ export function RecetasClient({
                       >
                         <option value="BORRADOR">Borrador (Edición)</option>
                         <option value="REVISION">En Revisión técnica</option>
-                        <option value="ACTIVA">Activa para producción</option>
+                        <option value="ACTIVA">Activa para fabricación</option>
                       </select>
                     </label>
 
@@ -431,7 +431,7 @@ export function RecetasClient({
                     <div className="space-y-2 border-t border-[var(--border-soft)] pt-4">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                          Ingredientes (Almacén de Insumos)
+                          Materiales (almacén)
                         </span>
                         <button
                           type="button"
@@ -439,13 +439,13 @@ export function RecetasClient({
                           className="inline-flex items-center gap-1 text-[0.7rem] font-bold text-[var(--brand)] hover:underline"
                         >
                           <Plus className="h-3.5 w-3.5" />
-                          Añadir ingrediente
+                          Añadir material
                         </button>
                       </div>
 
                       {editInsumosList.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-[var(--border-soft)] p-4 text-center text-xs text-[var(--cacao-light)]">
-                          Ningún ingrediente agregado. Haz clic en "Añadir ingrediente" para vincular insumos del inventario.
+                          Ningún material agregado. Haz clic en "Añadir material" para vincular materiales del inventario.
                         </div>
                       ) : (
                         <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -460,7 +460,7 @@ export function RecetasClient({
                                 required
                                 className="field-control h-10 flex-1 rounded-lg px-3 text-[0.7rem] font-semibold"
                               >
-                                <option value="">Seleccionar ingrediente...</option>
+                                <option value="">Seleccionar material...</option>
                                 {materiasPrimas.map((mp) => (
                                   <option key={mp.id} value={mp.id}>
                                     {mp.nombre} ({mp.unidad_medida})
@@ -468,7 +468,7 @@ export function RecetasClient({
                                 ))}
                               </select>
 
-                              {/* Cantidad de Insumo */}
+                              {/* Cantidad de material */}
                               <input
                                 type="number"
                                 min="0.01"
@@ -499,7 +499,7 @@ export function RecetasClient({
                         </div>
                       )}
 
-                      {/* Campo oculto que serializa el JSON de ingredientes para el Server Action */}
+                      {/* Campo oculto que serializa el JSON de materiales para el Server Action */}
                       <input
                         type="hidden"
                         name="insumos_json"
@@ -507,17 +507,17 @@ export function RecetasClient({
                       />
                     </div>
 
-                    {/* Pasos / Instrucciones de preparación */}
+                    {/* Proceso / instrucciones de fabricación */}
                     <label className="block border-t border-[var(--border-soft)] pt-4">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                        Pasos de Preparación (Instrucciones)
+                        Proceso de fabricación (instrucciones)
                       </span>
                       <textarea
                         name="instrucciones"
                         rows={4}
                         value={editInstrucciones}
                         onChange={(e) => setEditInstrucciones(e.target.value)}
-                        placeholder="Escribe las instrucciones detalladas paso a paso para el personal de repostería..."
+                        placeholder="Escribe las instrucciones de corte, armado, lijado, acabado e instalación para el personal de taller..."
                         className="field-control mt-1.5 w-full rounded-lg p-3 text-xs font-medium leading-relaxed resize-y"
                       />
                     </label>
@@ -553,7 +553,7 @@ export function RecetasClient({
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-5 py-4">
                   <div>
                     <h3 className="text-base font-bold text-[#4A2B32]">Ficha Técnica</h3>
-                    <p className="text-xs text-[#6F4A52]">Guía de ingredientes y pasos de preparación.</p>
+                    <p className="text-xs text-[#6F4A52]">Guía de materiales y proceso de fabricación.</p>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {/* Botón de Editar */}
@@ -561,7 +561,7 @@ export function RecetasClient({
                       type="button"
                       onClick={startEditing}
                       className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[var(--cream)] text-[#6F4A52] hover:text-[var(--brand)] transition-colors"
-                      title="Editar receta"
+                      title="Editar ficha"
                     >
                       <Pencil aria-hidden="true" className="h-4.5 w-4.5" />
                     </button>
@@ -570,7 +570,7 @@ export function RecetasClient({
                       type="button"
                       onClick={() => setIsDeleteConfirmOpen(true)}
                       className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-red-50 text-[#6F4A52] hover:text-red-600 transition-colors"
-                      title="Eliminar receta"
+                      title="Eliminar ficha"
                     >
                       <Trash2 aria-hidden="true" className="h-4.5 w-4.5" />
                     </button>
@@ -632,11 +632,11 @@ export function RecetasClient({
                     );
                   })()}
 
-                  {/* Lista de Ingredientes (Insumos) */}
+                  {/* Lista de materiales */}
                   <section className="space-y-2">
                     <h5 className="text-xs font-bold uppercase tracking-wider text-[var(--brand)] flex items-center gap-1.5">
                       <ClipboardList className="h-4 w-4" />
-                      Ingredientes (Insumos)
+                      Materiales
                     </h5>
                     <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--cream)]/30 p-4">
                       {(() => {
@@ -644,7 +644,7 @@ export function RecetasClient({
                         if (insumos.length === 0) {
                           return (
                             <p className="text-xs italic text-[var(--cacao-light)]">
-                              No se han configurado insumos para esta receta.
+                              No se han configurado materiales para esta ficha.
                             </p>
                           );
                         }
@@ -658,7 +658,7 @@ export function RecetasClient({
                                   className="flex items-center justify-between py-2 text-xs text-[var(--cacao)]"
                                 >
                                   <span className="font-semibold">
-                                    {mp?.nombre ?? "Ingrediente Desconocido"}
+                                    {mp?.nombre ?? "Material desconocido"}
                                   </span>
                                   <span className="font-bold text-[var(--brand-dark)]">
                                     {insumo.cantidad_insumo} {mp?.unidad_medida || "unidad"}
@@ -672,16 +672,16 @@ export function RecetasClient({
                     </div>
                   </section>
 
-                  {/* Pasos de Preparación (Instrucciones) */}
+                  {/* Proceso de fabricación (instrucciones) */}
                   <section className="space-y-2">
                     <h5 className="text-xs font-bold uppercase tracking-wider text-[var(--brand)] flex items-center gap-1.5">
                       <Info className="h-4 w-4" />
-                      Pasos de Preparación
+                      Proceso de fabricación
                     </h5>
                     <div className="rounded-xl border border-[var(--border-soft)] bg-[#FFF9F5]/80 p-4 min-h-[8rem]">
                       <p className="whitespace-pre-line text-xs leading-relaxed text-[var(--cacao)]">
                         {selectedRecipe.instrucciones ||
-                          "No se han redactado instrucciones para esta receta. Haz clic en Editar receta para agregarlas."}
+                          "No se han redactado instrucciones para esta ficha. Haz clic en Editar ficha para agregarlas."}
                       </p>
                     </div>
                   </section>
@@ -694,8 +694,8 @@ export function RecetasClient({
                     onClick={handleCloseDetails}
                     className="btn-primary flex flex-1 items-center justify-center gap-2 rounded-xl h-12 text-sm font-semibold shadow-soft"
                   >
-                    <ChefHat className="h-4.5 w-4.5" />
-                    Hornar / Producir Lote
+                    <Hammer className="h-4.5 w-4.5" />
+                    Enviar a taller
                   </Link>
                 </div>
               </>
@@ -713,14 +713,14 @@ export function RecetasClient({
                 <AlertCircle className="h-6 w-6" />
               </div>
               <div>
-                <h4 className="text-base font-bold text-[#4A2B32]">¿Eliminar Receta?</h4>
-                <p className="text-xs text-[#6F4A52]">Confirmar acción para la receta: <strong className="text-[var(--cacao)]">{selectedRecipe.nombre}</strong></p>
+                <h4 className="text-base font-bold text-[#4A2B32]">¿Eliminar ficha?</h4>
+                <p className="text-xs text-[#6F4A52]">Confirmar acción para la ficha: <strong className="text-[var(--cacao)]">{selectedRecipe.nombre}</strong></p>
               </div>
             </div>
 
             <p className="mt-4 text-xs text-[#6F4A52] leading-relaxed">
-              Esta acción eliminará físicamente la receta y sus ingredientes si nunca ha sido utilizada.
-              Si ya se usó en producción, se **archivará de forma segura** para conservar el historial de producción.
+              Esta acción eliminará físicamente la ficha y sus materiales si nunca ha sido utilizada.
+              Si ya se usó en fabricación, se **archivará de forma segura** para conservar el historial del taller.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
@@ -766,9 +766,9 @@ export function RecetasClient({
             {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-5 py-4">
               <div>
-                <h3 className="text-base font-bold text-[#4A2B32]">Crear Receta Técnica</h3>
+                <h3 className="text-base font-bold text-[#4A2B32]">Crear ficha técnica</h3>
                 <p className="text-xs text-[#6F4A52]">
-                  Configura insumos e instrucciones para controlar tus lotes.
+                  Configura materiales, rendimiento e instrucciones para controlar fabricación.
                 </p>
               </div>
               <button
@@ -783,15 +783,15 @@ export function RecetasClient({
             {/* Formulario */}
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
-                {/* Nombre de la Receta */}
+                {/* Nombre de la ficha */}
                 <label className="block">
                   <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                    Nombre de la Receta
+                    Nombre de la ficha
                   </span>
                   <input
                     name="nombre"
                     required
-                    placeholder="Ej. Pastel de Tres Leches Tradicional"
+                    placeholder="Ej. Puerta sólida de cedro 90 x 210"
                     className="field-control mt-1.5 h-11 w-full rounded-lg px-3 text-xs font-semibold"
                   />
                 </label>
@@ -858,7 +858,7 @@ export function RecetasClient({
                   >
                     <option value="BORRADOR">Borrador (Edición)</option>
                     <option value="REVISION">En Revisión técnica</option>
-                    <option value="ACTIVA">Activa para producción</option>
+                    <option value="ACTIVA">Activa para fabricación</option>
                   </select>
                 </label>
 
@@ -866,7 +866,7 @@ export function RecetasClient({
                 <div className="space-y-2 border-t border-[var(--border-soft)] pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                      Ingredientes (Almacén de Insumos)
+                      Materiales (almacén)
                     </span>
                     <button
                       type="button"
@@ -874,13 +874,13 @@ export function RecetasClient({
                       className="inline-flex items-center gap-1 text-[0.7rem] font-bold text-[var(--brand)] hover:underline"
                     >
                       <Plus className="h-3.5 w-3.5" />
-                      Añadir ingrediente
+                      Añadir material
                     </button>
                   </div>
 
                   {insumosList.length === 0 ? (
                     <div className="rounded-lg border border-dashed border-[var(--border-soft)] p-4 text-center text-xs text-[var(--cacao-light)]">
-                      Ningún ingrediente agregado. Haz clic en "Añadir ingrediente" para vincular insumos del inventario.
+                      Ningún material agregado. Haz clic en "Añadir material" para vincular materiales del inventario.
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -895,7 +895,7 @@ export function RecetasClient({
                             required
                             className="field-control h-10 flex-1 rounded-lg px-3 text-[0.7rem] font-semibold"
                           >
-                            <option value="">Seleccionar ingrediente...</option>
+                            <option value="">Seleccionar material...</option>
                             {materiasPrimas.map((mp) => (
                               <option key={mp.id} value={mp.id}>
                                 {mp.nombre} ({mp.unidad_medida})
@@ -903,7 +903,7 @@ export function RecetasClient({
                             ))}
                           </select>
 
-                          {/* Cantidad de Insumo */}
+                          {/* Cantidad de material */}
                           <input
                             type="number"
                             min="0.01"
@@ -934,7 +934,7 @@ export function RecetasClient({
                     </div>
                   )}
 
-                  {/* Campo oculto que serializa el JSON de ingredientes para el Server Action */}
+                  {/* Campo oculto que serializa el JSON de materiales para el Server Action */}
                   <input
                     type="hidden"
                     name="insumos_json"
@@ -942,15 +942,15 @@ export function RecetasClient({
                   />
                 </div>
 
-                {/* Pasos / Instrucciones de preparación */}
+                {/* Proceso / instrucciones de fabricación */}
                 <label className="block border-t border-[var(--border-soft)] pt-4">
                   <span className="text-xs font-bold uppercase tracking-wider text-[#4A2B32]">
-                    Pasos de Preparación (Instrucciones)
+                    Proceso de fabricación (instrucciones)
                   </span>
                   <textarea
                     name="instrucciones"
                     rows={4}
-                    placeholder="Escribe las instrucciones detalladas paso a paso para el personal de repostería..."
+                    placeholder="Escribe las instrucciones de corte, armado, lijado, acabado e instalación para el personal de taller..."
                     className="field-control mt-1.5 w-full rounded-lg p-3 text-xs font-medium leading-relaxed resize-y"
                   />
                 </label>
@@ -968,7 +968,7 @@ export function RecetasClient({
                   ) : (
                     <Save aria-hidden="true" className="h-5 w-5" />
                   )}
-                  {isPending ? "Guardando receta..." : "Guardar Ficha Técnica"}
+                  {isPending ? "Guardando ficha..." : "Guardar Ficha Técnica"}
                 </button>
               </div>
             </form>

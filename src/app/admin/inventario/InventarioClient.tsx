@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PackagePlus, Wheat, ShoppingBag } from "lucide-react";
+import { Boxes, PackagePlus, ShoppingBag } from "lucide-react";
 import { AdminSection, StatusBadge } from "@/components/admin/AdminSection";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 
@@ -9,7 +9,7 @@ export type InventoryRow = {
   id: string;
   sku: string;
   nombre: string;
-  tipo: "Producto" | "Ingrediente";
+  tipo: "Producto" | "Material";
   categoria: string;
   cantidad: number;
   unidad: string;
@@ -32,7 +32,7 @@ function statusLabel(status: InventoryRow["estado"]) {
     DISPONIBLE: "Disponible",
     STOCK_BAJO: "Stock bajo",
     AGOTADO: "Agotado",
-    POR_VENCER: "Por vencer",
+    POR_VENCER: "Revisión próxima",
     RESERVADO: "Reservado"
   };
 
@@ -47,12 +47,12 @@ type InventarioClientProps = {
 export function InventarioClient({ rows, error }: InventarioClientProps) {
   const columns: Array<ResponsiveTableColumn<InventoryRow>> = [
     { key: "sku", header: "Codigo / SKU", className: "w-32", cell: (row) => row.sku },
-    { key: "nombre", header: "Producto o ingrediente", cell: (row) => <span className="font-semibold">{row.nombre}</span> },
+    { key: "nombre", header: "Producto o material", cell: (row) => <span className="font-semibold">{row.nombre}</span> },
     { key: "categoria", header: "Categoria", cell: (row) => row.categoria },
     { key: "cantidad", header: "Cantidad actual", className: "w-36", cell: (row) => `${row.cantidad} ${row.unidad}` },
     { key: "minimo", header: "Stock minimo", className: "w-28", cell: (row) => row.minimo },
     { key: "proveedor", header: "Proveedor", cell: (row) => row.proveedor },
-    { key: "vencimiento", header: "Vencimiento", className: "w-32", cell: (row) => row.vencimiento },
+    { key: "vencimiento", header: "Fecha lote", className: "w-32", cell: (row) => row.vencimiento },
     { key: "costo", header: "Costo unitario", className: "w-32", cell: (row) => `C$ ${row.costo.toFixed(2)}` },
     { key: "estado", header: "Estado", className: "w-36", cell: (row) => <StatusBadge label={statusLabel(row.estado)} tone={statusTone(row.estado)} /> }
   ];
@@ -61,7 +61,7 @@ export function InventarioClient({ rows, error }: InventarioClientProps) {
     <AdminSection
       eyebrow="Control de stock"
       title="Inventario"
-      description="Tabla operativa para cantidades, proveedores, vencimientos y estados."
+      description="Tabla operativa para productos terminados, madera, herrajes, consumibles, proveedores y estados."
       action={
         <div className="flex flex-col gap-2 sm:flex-row">
           <Link href="/admin/compras" className="btn-secondary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold">
@@ -73,8 +73,8 @@ export function InventarioClient({ rows, error }: InventarioClientProps) {
             Productos
           </Link>
           <Link href="/admin/materias-primas" className="btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold">
-            <Wheat aria-hidden="true" className="h-4 w-4" />
-            Ingredientes
+            <Boxes aria-hidden="true" className="h-4 w-4" />
+            Materiales
           </Link>
         </div>
       }

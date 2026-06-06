@@ -8,14 +8,14 @@ async function loadComprasPageData() {
   try {
     const supabase = await createSupabaseServerClient();
 
-    // 1. Obtener el historial de compras con detalles e insumos
+    // 1. Obtener el historial de compras con detalles y materiales
     const { data: purchasesData, error: purchasesErr } = await supabase
       .from("compras")
       .select("*, compra_detalles(*, materias_primas(nombre, unidad_medida))")
       .order("fecha_compra", { ascending: false })
       .order("created_at", { ascending: false });
 
-    // 2. Obtener catálogo de materias primas para el combobox
+    // 2. Obtener catálogo de materiales para el combobox
     const { data: materialsData, error: materialsErr } = await supabase
       .from("materias_primas")
       .select("*")

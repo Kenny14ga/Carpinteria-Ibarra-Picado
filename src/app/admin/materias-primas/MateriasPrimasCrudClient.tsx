@@ -3,7 +3,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, CheckCircle2, Pencil, Plus, RefreshCw, Save, Trash2, Wheat, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Boxes, CheckCircle2, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 import type { MateriaPrimaRow } from "@/lib/supabase";
 import {
@@ -57,7 +57,7 @@ function statusLabel(status: string) {
     DISPONIBLE: "Disponible",
     STOCK_BAJO: "Stock bajo",
     AGOTADO: "Agotado",
-    POR_VENCER: "Por vencer",
+    POR_VENCER: "Revisión próxima",
     RESERVADO: "Reservado"
   };
 
@@ -173,7 +173,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
     },
     {
       key: "nombre",
-      header: "Ingrediente",
+      header: "Material",
       cell: (item) => (
         <div className="min-w-0">
           <p className="truncate font-semibold text-[#4A2B32]">{item.nombre}</p>
@@ -199,7 +199,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
     },
     {
       key: "vencimiento",
-      header: "Vence",
+      header: "Fecha lote",
       className: "w-32",
       cell: (item) => item.fecha_vencimiento || "-"
     },
@@ -227,22 +227,22 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            title="Editar ingrediente"
+            title="Editar material"
             onClick={() => openEditDrawer(item)}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-[#F2D6DE] text-[#6F4A52] transition hover:bg-[#FFF9F5] focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2"
           >
             <Pencil aria-hidden="true" className="h-4 w-4" />
-            <span className="sr-only">Editar ingrediente</span>
+            <span className="sr-only">Editar material</span>
           </button>
           <button
             type="button"
-            title="Eliminar ingrediente"
+            title="Eliminar material"
             onClick={() => handleDelete(item)}
             disabled={deletingId === item.id}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-[#F2D6DE] text-[#6F4A52] transition hover:border-red-200 hover:bg-red-50 hover:text-[#B42318] focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {deletingId === item.id ? <RefreshCw aria-hidden="true" className="h-4 w-4 animate-spin" /> : <Trash2 aria-hidden="true" className="h-4 w-4" />}
-            <span className="sr-only">Eliminar ingrediente</span>
+            <span className="sr-only">Eliminar material</span>
           </button>
         </div>
       )
@@ -263,8 +263,8 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-[#8B2E54]">Inventario de insumos</p>
-            <h1 className="brand-heading mt-1 text-3xl font-semibold">Materias primas</h1>
+            <p className="text-sm font-medium text-[#8B2E54]">Inventario de materiales</p>
+            <h1 className="brand-heading mt-1 text-3xl font-semibold">Materiales y madera</h1>
           </div>
           <button
             type="button"
@@ -272,7 +272,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
             className="btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2"
           >
             <Plus aria-hidden="true" className="h-5 w-5" />
-            Agregar ingrediente
+            Agregar material
           </button>
         </div>
       </header>
@@ -281,7 +281,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-semibold text-[#4A2B32]">Control operativo</h2>
-            <p className="text-sm text-[#6F4A52]">{items.length} ingredientes registrados</p>
+            <p className="text-sm text-[#6F4A52]">{items.length} materiales registrados</p>
           </div>
           <div className="w-full sm:w-96">
             <Alert result={alert} />
@@ -294,9 +294,9 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
           getRowKey={(item) => item.id}
           emptyState={
             <div>
-              <Wheat aria-hidden="true" className="mx-auto h-10 w-10 text-[#F48CAA]" />
-              <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin materias primas</p>
-              <p className="mt-1 text-sm text-[#6F4A52]">Agrega harina, leche, huevos u otros insumos base.</p>
+              <Boxes aria-hidden="true" className="mx-auto h-10 w-10 text-[#F48CAA]" />
+              <p className="mt-3 text-sm font-semibold text-[#4A2B32]">Sin materiales</p>
+              <p className="mt-1 text-sm text-[#6F4A52]">Agrega madera, tableros, barnices, herrajes o consumibles.</p>
             </div>
           }
           renderMobileCard={(item) => {
@@ -343,8 +343,8 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
           <aside className="absolute inset-x-0 bottom-0 max-h-[92vh] overflow-y-auto rounded-t-md bg-white shadow-soft md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[32rem] md:max-h-none md:rounded-none">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#F2D6DE] bg-white px-4 py-4">
               <div>
-                <h2 className="text-base font-semibold text-[#4A2B32]">{drawerMode === "edit" ? "Editar ingrediente" : "Agregar ingrediente"}</h2>
-                <p className="text-sm text-[#6F4A52]">Datos online para compras, inventario y produccion.</p>
+                <h2 className="text-base font-semibold text-[#4A2B32]">{drawerMode === "edit" ? "Editar material" : "Agregar material"}</h2>
+                <p className="text-sm text-[#6F4A52]">Datos online para compras, inventario y fabricación.</p>
               </div>
               <button type="button" title="Cerrar" onClick={closeDrawer} className="flex h-10 w-10 items-center justify-center rounded-md text-[#6F4A52] transition hover:bg-[#FFF9F5] focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2">
                 <X aria-hidden="true" className="h-5 w-5" />
@@ -374,12 +374,19 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
                   <span className="text-sm font-medium text-[#4A2B32]">Unidad</span>
-                  <select name="unidad_medida" defaultValue={selectedItem?.unidad_medida ?? "kg"} className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm">
+                  <select name="unidad_medida" defaultValue={selectedItem?.unidad_medida ?? "unidad"} className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm">
+                    <option value="unidad">unidades</option>
+                    <option value="pie_tablar">pies tablares</option>
+                    <option value="pie_lineal">pies lineales</option>
+                    <option value="m">metros</option>
+                    <option value="m2">m²</option>
+                    <option value="lamina">láminas</option>
+                    <option value="juego">juegos</option>
+                    <option value="galon">galones</option>
                     <option value="kg">kg</option>
                     <option value="g">g</option>
                     <option value="l">litros</option>
                     <option value="ml">ml</option>
-                    <option value="unidad">unidades</option>
                   </select>
                 </label>
                 <label className="block">
@@ -409,7 +416,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
                   <input name="costo_unitario" type="number" min="0" step="0.01" defaultValue={selectedItem?.costo_unitario ?? 0} className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-medium text-[#4A2B32]">Vencimiento</span>
+                  <span className="text-sm font-medium text-[#4A2B32]">Fecha de lote/revisión</span>
                   <input name="fecha_vencimiento" type="date" defaultValue={selectedItem?.fecha_vencimiento ?? ""} className="field-control mt-1 h-11 w-full rounded-md px-3 text-sm" />
                 </label>
               </div>
@@ -422,7 +429,7 @@ export function MateriasPrimasCrudClient({ items, initialError }: MateriasPrimas
               <div className="sticky bottom-0 -mx-4 border-t border-[#F2D6DE] bg-white p-4">
                 <button type="submit" disabled={isPending} className="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#B83E6C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#D7A1B6]">
                   {isPending ? <RefreshCw aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Save aria-hidden="true" className="h-5 w-5" />}
-                  {isPending ? "Guardando" : "Guardar ingrediente"}
+                  {isPending ? "Guardando" : "Guardar material"}
                 </button>
               </div>
             </form>

@@ -33,7 +33,7 @@ async function loadProduccion() {
       recetas: [] as RecetaRow[],
       recetaInsumos: [] as RecetaInsumoRow[],
       materiasPrimas: [] as MateriaPrimaRow[],
-      error: error instanceof Error ? error.message : "No se pudo cargar produccion."
+      error: error instanceof Error ? error.message : "No se pudo cargar el taller."
     };
   }
 }
@@ -43,9 +43,9 @@ export default async function ProduccionPage() {
 
   return (
     <AdminSection
-      eyebrow="Cocina y hornadas"
-      title="Produccion"
-      description="Planifica lotes, revisa cantidades terminadas y da seguimiento a lo que entra a vitrina."
+      eyebrow="Taller y fabricación"
+      title="Taller"
+      description="Procesa órdenes de fabricación, revisa materiales requeridos y suma piezas terminadas al catálogo."
     >
       <ProduccionClient
         rows={rows}

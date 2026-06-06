@@ -7,6 +7,7 @@ import {
   BarChart3,
   Boxes,
   ClipboardList,
+  Hammer,
   LayoutDashboard,
   LogOut,
   MoreHorizontal,
@@ -22,7 +23,7 @@ const items = [
   { label: "Inicio", href: "/admin", icon: LayoutDashboard },
   { label: "Inventario", href: "/admin/inventario", icon: Boxes },
   { label: "Productos", href: "/admin/productos", icon: Package },
-  { label: "Recetas", href: "/admin/recetas", icon: ClipboardList },
+  { label: "Fichas", href: "/admin/recetas", icon: ClipboardList },
   { label: "Más", href: "#more", icon: MoreHorizontal }
 ];
 
@@ -54,6 +55,7 @@ export function MobileNav() {
 
   const moreItems = [
     { label: "Reportes", href: "/admin/reportes", icon: BarChart3 },
+    { label: "Taller", href: "/admin/produccion", icon: Hammer },
     { label: "Finanzas", href: "/admin/finanzas", icon: CircleDollarSign },
     { label: "Usuarios", href: "/admin/usuarios", icon: Users },
     { label: "Ajustes", href: "/admin/ajustes", icon: Settings }
