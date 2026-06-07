@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { logoutAction } from "@/app/auth/actions";
 import { db } from "@/lib/db";
@@ -68,7 +69,8 @@ function TopBar() {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const { count, error } = await (supabase.from("pedidos_clientes" as any) as any)
+        const { count, error } = await supabase
+          .from("pedidos_clientes")
           .select("*", { count: "exact", head: true })
           .eq("estado", "ESPERANDO_WSP");
         if (!error && count !== null) {
@@ -154,15 +156,17 @@ function TopBar() {
     >
       {/* Izquierda: Logo + nombre de usuario */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-        <img
-          src="/LOGOS/logo-mark.svg"
-          alt="Riquiquísimo"
+        <Image
+          src="/LOGOSCAP/simbolo_solo.svg"
+          alt="Carpintería Ibarra Picado"
+          width={36}
+          height={36}
           style={{
             width: "2.25rem",
             height: "2.25rem",
             borderRadius: "0.625rem",
             objectFit: "contain",
-            boxShadow: "0 2px 8px rgba(184, 62, 108, 0.25)",
+            boxShadow: "0 2px 8px rgba(139, 94, 52, 0.25)",
             flexShrink: 0,
           }}
         />
@@ -178,7 +182,7 @@ function TopBar() {
               marginBottom: "0.125rem",
             }}
           >
-            Riquiquísimo
+            Carpintería Ibarra Picado
           </p>
           <p
             style={{
@@ -376,7 +380,7 @@ export default function PosLayout({
           // 1. Guardar productos en Dexie
           await db.productos.clear();
           await db.productos.bulkPut(
-            data.map((p: any) => ({
+            data.map((p) => ({
               id: p.id,
               nombre: p.nombre,
               descripcion: p.descripcion || "",
@@ -386,7 +390,7 @@ export default function PosLayout({
               en_vitrina: p.en_vitrina || false,
               stock_vitrina: p.stock_vitrina || 0,
               alergenos: p.alergenos || [],
-              imagen_url: p.imagen_url || null,
+              imagen_url: p.imagen_url || undefined,
               sync_status: "SYNCED"
             }))
           );
@@ -395,7 +399,7 @@ export default function PosLayout({
           const now = Date.now();
           await db.stock_vitrina.clear();
           await db.stock_vitrina.bulkPut(
-            data.map((p: any) => ({
+            data.map((p) => ({
               producto_id: p.id,
               cantidad: p.stock_vitrina || 0,
               updated_at: now

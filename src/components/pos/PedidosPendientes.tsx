@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePosStore } from "@/store/usePosStore";
-import { X, Check, Trash2, Inbox, AlertTriangle, RefreshCw, AlertCircle, ChefHat } from "lucide-react";
+import { X, Check, Trash2, Inbox, AlertTriangle, RefreshCw, AlertCircle, Hammer } from "lucide-react";
 
 type PedidoCliente = {
   id: string;
@@ -13,7 +13,7 @@ type PedidoCliente = {
   detalles_personalizados?: string;
   items: { id: string; nombre: string; precio_unitario: number; cantidad: number }[];
   total: number;
-  estado: "ESPERANDO_WSP" | "ACEPTADO" | "RECHAZADO";
+  estado: "ESPERANDO_WSP" | "ACEPTADO" | "RECHAZADO" | "CONVERTIDO";
   created_at: string;
 };
 
@@ -48,7 +48,8 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
     setLoading(true);
     setError(null);
     try {
-      const { data, error: fetchErr } = await (supabase.from("pedidos_clientes" as any) as any)
+      const { data, error: fetchErr } = await supabase
+        .from("pedidos_clientes")
         .select("*")
         .eq("estado", "ESPERANDO_WSP")
         .order("created_at", { ascending: false });
@@ -71,7 +72,7 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
   // Suscripción Realtime y Window Online Event
   useEffect(() => {
     // 1. Cargar inicial
-    fetchPedidos();
+    void Promise.resolve().then(fetchPedidos);
 
     // 2. Evento de red restablecida (online) para volver a consultar
     const handleOnline = () => {
@@ -109,7 +110,8 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
   const handleAprobar = async (pedido: PedidoCliente) => {
     try {
       // 1. Actualizar estado en Supabase primero
-      const { error: updateErr } = await (supabase.from("pedidos_clientes" as any) as any)
+      const { error: updateErr } = await supabase
+        .from("pedidos_clientes")
         .update({ estado: "ACEPTADO" })
         .eq("id", pedido.id);
 
@@ -129,7 +131,7 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
       }
 
       // 3. Remover localmente si no tiene alertas críticas, o refrescar
-      fetchPedidos();
+      void fetchPedidos();
     } catch (err) {
       console.error("[PedidosPendientes] Error al aprobar pedido:", err);
       alert("Error al intentar aprobar el pedido. Revisa tu conexión a internet.");
@@ -138,11 +140,12 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
 
   // Acción Descartar / Rechazar
   const handleDescartar = async (pedido: PedidoCliente) => {
-    const confirmed = window.confirm(`¿Deseas rechazar y ocultar el pedido de "${pedido.cliente_nombre}"?`);
+    const confirmed = window.confirm(`¿Deseas rechazar y ocultar el pedido de ${pedido.cliente_nombre}?`);
     if (!confirmed) return;
 
     try {
-      const { error: updateErr } = await (supabase.from("pedidos_clientes" as any) as any)
+      const { error: updateErr } = await supabase
+        .from("pedidos_clientes")
         .update({ estado: "RECHAZADO" })
         .eq("id", pedido.id);
 
@@ -157,7 +160,7 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
         return copy;
       });
 
-      fetchPedidos();
+      void fetchPedidos();
     } catch (err) {
       console.error("[PedidosPendientes] Error al descartar pedido:", err);
       alert("Error al descartar el pedido. Revisa tu conexión a internet.");
@@ -266,11 +269,11 @@ export function PedidosPendientes({ isOpen, onClose, onPendingCountChange }: Ped
                   {pedido.detalles_personalizados && (
                     <div className="rounded-xl bg-[#FFF5F6] border border-[#F2D6DE] p-2.5 text-xs text-[#8B2E54]">
                       <p className="font-bold flex items-center gap-1.5 text-[#8B2E54] mb-1">
-                        <ChefHat className="h-3.5 w-3.5" />
-                        Encargo Especial:
+                        <Hammer className="h-3.5 w-3.5" />
+                        Trabajo a medida:
                       </p>
                       <p className="text-[#6F4A52] leading-relaxed italic">
-                        "{pedido.detalles_personalizados}"
+                        &quot;{pedido.detalles_personalizados}&quot;
                       </p>
                     </div>
                   )}

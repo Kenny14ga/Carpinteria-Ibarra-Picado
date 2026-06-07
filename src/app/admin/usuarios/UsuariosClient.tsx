@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CheckCircle2, Plus, RefreshCw, Trash2, User as UserIcon, Users } from "lucide-react";
-import { AdminSection, MetricCard } from "@/components/admin/AdminSection";
+import { MetricCard } from "@/components/admin/AdminSection";
 import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/ui/ResponsiveTable";
 import { UserModal } from "@/components/admin/UserModal";
 import { deleteUserAction, type UserActionResult } from "./actions";

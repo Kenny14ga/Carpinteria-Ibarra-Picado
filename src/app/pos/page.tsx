@@ -7,17 +7,18 @@ import { usePosStore, type PosCartItem } from "@/store/usePosStore";
 import { TicketPDF } from "@/components/pos/TicketPDF";
 import {
   Store,
-  Cake,
-  Cookie,
-  Coffee,
-  Croissant,
-  IceCream,
+  DoorOpen,
+  Hammer,
+  Package,
+  Ruler,
+  Wrench,
   ReceiptText,
   Trash2,
   X,
   Plus,
   Minus,
-  ImageIcon
+  ImageIcon,
+  type LucideIcon
 } from "lucide-react";
 
 /* ─── Helpers ─── */
@@ -74,40 +75,40 @@ function ProductPhoto({ producto }: { producto: Producto }) {
 }
 
 /* ─── Categorías estáticas para filtro ─── */
-type Categoria = { id: string; label: string; icon: React.ComponentType<any> };
+type Categoria = { id: string; label: string; icon: LucideIcon };
 
 const CATEGORIAS: Categoria[] = [
   { id: "todos", label: "Todos", icon: Store },
-  { id: "pasteles", label: "Pasteles", icon: Cake },
-  { id: "galletas", label: "Galletas", icon: Cookie },
-  { id: "bebidas", label: "Bebidas", icon: Coffee },
-  { id: "pan", label: "Pan", icon: Croissant },
-  { id: "postres", label: "Postres", icon: IceCream },
+  { id: "puertas", label: "Puertas", icon: DoorOpen },
+  { id: "muebles", label: "Muebles", icon: Hammer },
+  { id: "herrajes", label: "Herrajes", icon: Wrench },
+  { id: "maderas", label: "Maderas", icon: Ruler },
+  { id: "servicios", label: "Servicios", icon: Package },
 ];
 
 /** Inferir categoría a partir del nombre del producto para el filtro local */
 function inferCategory(nombre: string): string {
   const n = nombre.toLowerCase();
   if (
-    n.includes("pastel") || n.includes("tarta") || n.includes("torta") ||
-    n.includes("queque") || n.includes("bizcocho") || n.includes("velvet") ||
-    n.includes("tres leches") || n.includes("selva negra")
-  ) return "pasteles";
-  if (n.includes("galleta") || n.includes("cookie")) return "galletas";
+    n.includes("puerta") || n.includes("marco") || n.includes("porton") ||
+    n.includes("portón") || n.includes("ventana")
+  ) return "puertas";
   if (
-    n.includes("café") || n.includes("cafe") || n.includes("té") ||
-    n.includes("jugo") || n.includes("bebida") || n.includes("chocolate caliente") ||
-    n.includes("agua") || n.includes("soda") || n.includes("frappé")
-  ) return "bebidas";
+    n.includes("mueble") || n.includes("closet") || n.includes("clóset") ||
+    n.includes("gabinete") || n.includes("mesa") || n.includes("repisa")
+  ) return "muebles";
   if (
-    n.includes("pan") || n.includes("cuerno") || n.includes("croissant") ||
-    n.includes("dona") || n.includes("bollo") || n.includes("baguette")
-  ) return "pan";
+    n.includes("bisagra") || n.includes("cerradura") || n.includes("jaladera") ||
+    n.includes("tornillo") || n.includes("herraje")
+  ) return "herrajes";
   if (
-    n.includes("flan") || n.includes("mousse") || n.includes("pudín") ||
-    n.includes("helado") || n.includes("postre") || n.includes("cheesecake") ||
-    n.includes("brownie")
-  ) return "postres";
+    n.includes("madera") || n.includes("tablero") || n.includes("plywood") ||
+    n.includes("melamina") || n.includes("cedro") || n.includes("pino")
+  ) return "maderas";
+  if (
+    n.includes("instalacion") || n.includes("instalación") || n.includes("lijado") ||
+    n.includes("barniz") || n.includes("acabado") || n.includes("servicio")
+  ) return "servicios";
   return "otros";
 }
 

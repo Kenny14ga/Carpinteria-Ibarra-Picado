@@ -1,3 +1,9 @@
+type WhatsAppItem = {
+  nombre: string;
+  precio_unitario: number;
+  cantidad: number;
+};
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("es-NI", {
     style: "currency",
@@ -9,7 +15,7 @@ function formatCurrency(value: number) {
 export function generateWhatsAppLink(
   pedidoId: string,
   nombre: string,
-  items: any[],
+  items: WhatsAppItem[],
   total: number,
   options?: {
     telefono?: string;

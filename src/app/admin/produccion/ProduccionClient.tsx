@@ -59,20 +59,22 @@ export function ProduccionClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    const queryRecetaId = searchParams.get("recetaId");
-    if (queryRecetaId && recetas.some((r) => r.id === queryRecetaId)) {
-      setSelectedRecetaId(queryRecetaId);
-      setIsDrawerOpen(true);
-    }
-  }, [searchParams, recetas]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRecetaId, setSelectedRecetaId] = useState<string>("");
   const [lotes, setLotes] = useState<number>(1);
   const [alert, setAlert] = useState<ProcesarProduccionActionResult | null>(
     error ? { success: false, error } : null
   );
+
+  useEffect(() => {
+    const queryRecetaId = searchParams.get("recetaId");
+    if (queryRecetaId && recetas.some((r) => r.id === queryRecetaId)) {
+      void Promise.resolve().then(() => {
+        setSelectedRecetaId(queryRecetaId);
+        setIsDrawerOpen(true);
+      });
+    }
+  }, [searchParams, recetas]);
 
   function openDrawer() {
     setSelectedRecetaId("");

@@ -59,7 +59,7 @@ export async function obtenerReporteFinancieroAction(
     const ssrClient = await createSupabaseServerClient();
     
     // Llamar al RPC obtener_reporte_financiero
-    const { data, error } = await (ssrClient as any).rpc("obtener_reporte_financiero", {
+    const { data, error } = await ssrClient.rpc("obtener_reporte_financiero", {
       p_fecha_inicio: fechaInicio,
       p_fecha_fin: fechaFin
     });
@@ -69,12 +69,10 @@ export async function obtenerReporteFinancieroAction(
       throw new Error(error.message);
     }
 
-    const reportData = data as unknown as ReporteFinancieroData;
-
     return {
       ok: true,
       message: "Reporte generado correctamente.",
-      data: reportData
+      data
     };
   } catch (error) {
     return {

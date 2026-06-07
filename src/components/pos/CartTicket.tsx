@@ -3,8 +3,6 @@
 import { useMemo, useState } from "react";
 import {
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
   Minus,
   Plus,
   ReceiptText,
@@ -51,7 +49,7 @@ export function CartTicket() {
   }
 
   // Common ticket content shared between desktop and mobile bottom sheet
-  const TicketContent = () => (
+  const renderTicketContent = () => (
     <div className="flex h-full flex-col bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--border-soft)] px-4 py-4">
@@ -192,7 +190,7 @@ export function CartTicket() {
     <>
       {/* Desktop sidebar view */}
       <section className="hidden lg:flex lg:flex-col lg:h-[calc(100vh-10rem)] lg:min-h-[36rem] lg:w-96 rounded-2xl border border-[var(--border-soft)] bg-white shadow-[var(--shadow-md)] overflow-hidden lg:sticky lg:top-6">
-        <TicketContent />
+        {renderTicketContent()}
       </section>
 
       {/* Mobile bar and bottom sheet trigger */}
@@ -253,7 +251,7 @@ export function CartTicket() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <TicketContent />
+              {renderTicketContent()}
             </div>
           </aside>
         </div>

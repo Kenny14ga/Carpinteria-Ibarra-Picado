@@ -13,7 +13,6 @@ import {
   X,
   Hammer,
   Trash2,
-  Eye,
   Info,
   Pencil
 } from "lucide-react";
@@ -445,7 +444,7 @@ export function RecetasClient({
 
                       {editInsumosList.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-[var(--border-soft)] p-4 text-center text-xs text-[var(--cacao-light)]">
-                          Ningún material agregado. Haz clic en "Añadir material" para vincular materiales del inventario.
+                          Ningún material agregado. Haz clic en Añadir material para vincular materiales del inventario.
                         </div>
                       ) : (
                         <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -880,11 +879,11 @@ export function RecetasClient({
 
                   {insumosList.length === 0 ? (
                     <div className="rounded-lg border border-dashed border-[var(--border-soft)] p-4 text-center text-xs text-[var(--cacao-light)]">
-                      Ningún material agregado. Haz clic en "Añadir material" para vincular materiales del inventario.
+                      Ningún material agregado. Haz clic en Añadir material para vincular materiales del inventario.
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {insumosList.map((insumo, index) => (
+                      {insumosList.map((insumo) => (
                         <div key={insumo.id} className="flex items-center gap-2">
                           {/* Selector de Materia Prima */}
                           <select

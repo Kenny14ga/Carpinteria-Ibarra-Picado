@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import type { Json } from "@/lib/supabase";
 
 export type RegistrarCompraResult = {
   ok: boolean;
@@ -37,13 +38,13 @@ export async function registrarCompraAction(
       return { ok: false, message: "El número de factura es obligatorio." };
     }
     if (!payload.detalles || payload.detalles.length === 0) {
-      return { ok: false, message: "La compra debe tener al menos un ingrediente en el detalle." };
+      return { ok: false, message: "La compra debe tener al menos un material en el detalle." };
     }
 
     // Validar ítems del detalle
     for (const item of payload.detalles) {
       if (!item.materia_prima_id) {
-        return { ok: false, message: "Todos los detalles deben seleccionar un ingrediente válido." };
+        return { ok: false, message: "Todos los detalles deben seleccionar un material válido." };
       }
       if (item.cantidad <= 0) {
         return { ok: false, message: "La cantidad comprada debe ser mayor que cero." };
@@ -54,8 +55,8 @@ export async function registrarCompraAction(
     }
 
     // Invocar el stored procedure (RPC)
-    const { error } = await (supabase.rpc as any)("registrar_compra", {
-      p_compra: payload
+    const { error } = await supabase.rpc("registrar_compra", {
+      p_compra: payload as unknown as Json
     });
 
     if (error) {

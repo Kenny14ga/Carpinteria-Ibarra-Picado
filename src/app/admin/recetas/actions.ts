@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import type { Database } from "@/lib/supabase";
+import type { Database, Json } from "@/lib/supabase";
 
 export type RecetaActionResult = {
   ok: boolean;
@@ -10,6 +10,13 @@ export type RecetaActionResult = {
 };
 
 type RecetaInsert = Database["public"]["Tables"]["recetas"]["Insert"];
+
+type RecetaInsumoFormInput = {
+  materia_prima_id: string;
+  cantidad_insumo: number;
+};
+
+type RecetaInsumoRpcInput = RecetaInsumoFormInput;
 
 async function assertAdminAccess() {
   const ssrClient = await createSupabaseServerClient();
@@ -87,10 +94,7 @@ export async function createRecetaAction(formData: FormData): Promise<RecetaActi
     // Insertar receta_insumos si se provee el JSON de materiales.
     const insumosJson = readText(formData, "insumos_json");
     if (insumosJson) {
-      const insumos = JSON.parse(insumosJson) as Array<{
-        materia_prima_id: string;
-        cantidad_insumo: number;
-      }>;
+      const insumos = JSON.parse(insumosJson) as RecetaInsumoFormInput[];
 
       const validInsumos = insumos.filter(
         (ins) => ins.materia_prima_id.trim() !== "" && ins.cantidad_insumo > 0
@@ -140,12 +144,9 @@ export async function updateRecetaAction(formData: FormData): Promise<RecetaActi
 
     // Parsear el array de insumos
     const insumosJson = readText(formData, "insumos_json");
-    let insumos: any[] = [];
+    let insumos: RecetaInsumoRpcInput[] = [];
     if (insumosJson) {
-      const parsed = JSON.parse(insumosJson) as Array<{
-        materia_prima_id: string;
-        cantidad_insumo: number;
-      }>;
+      const parsed = JSON.parse(insumosJson) as RecetaInsumoFormInput[];
       insumos = parsed
         .filter((ins) => ins.materia_prima_id.trim() !== "" && ins.cantidad_insumo > 0)
         .map((ins) => ({
@@ -156,7 +157,7 @@ export async function updateRecetaAction(formData: FormData): Promise<RecetaActi
 
     const supabase = await createSupabaseServerClient();
     // Llamar al RPC
-    const { data, error } = await (supabase as any).rpc("actualizar_receta_completa", {
+    const { data, error } = await supabase.rpc("actualizar_receta_completa", {
       p_id: id,
       p_nombre: nombre,
       p_producto_id: producto_id,
@@ -164,14 +165,14 @@ export async function updateRecetaAction(formData: FormData): Promise<RecetaActi
       p_rendimiento_unidades: rendimiento,
       p_estado: estado,
       p_instrucciones: instrucciones,
-      p_insumos: insumos
+      p_insumos: insumos as unknown as Json
     });
 
     if (error) {
       throw new Error(error.message);
     }
 
-    const result = data as { ok: boolean; message: string; costo_estimado?: number };
+    const result = data;
     if (!result.ok) {
       throw new Error(result.message || "Error al actualizar la ficha en la base de datos.");
     }
@@ -195,7 +196,7 @@ export async function deleteRecetaAction(id: string): Promise<RecetaActionResult
 
     const supabase = await createSupabaseServerClient();
     // Llamar al RPC
-    const { data, error } = await (supabase as any).rpc("eliminar_receta_segura", {
+    const { data, error } = await supabase.rpc("eliminar_receta_segura", {
       p_receta_id: id
     });
 
@@ -203,7 +204,7 @@ export async function deleteRecetaAction(id: string): Promise<RecetaActionResult
       throw new Error(error.message);
     }
 
-    const result = data as { ok: boolean; message: string; action: "ARCHIVED" | "DELETED" };
+    const result = data;
     if (!result.ok) {
       throw new Error(result.message || "Error al eliminar la ficha en la base de datos.");
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { 
   CircleDollarSign, 
   TrendingDown, 
@@ -64,10 +64,6 @@ export function FinanzasClient() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    void fetchReporte(fechaInicio, fechaFin);
-  }, []);
 
   const handleFetchReporte = (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,7 +180,7 @@ export function FinanzasClient() {
         </div>
       ) : (
         <div className="surface-card rounded-xl p-8 text-center text-[var(--cacao-muted)]">
-          Seleccione un rango de fechas y presione "Generar Reporte" para visualizar los indicadores financieros.
+          Seleccione un rango de fechas y presione Generar Reporte para visualizar los indicadores financieros.
         </div>
       )}
     </AdminSection>

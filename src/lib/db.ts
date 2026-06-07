@@ -44,6 +44,7 @@ export interface Receta {
 
 export interface SyncQueueItem {
   id?: number;
+  tipo_accion?: SyncQueueAction;
   action?: SyncQueueAction;
   accion?: string;
   payload: unknown;
@@ -53,7 +54,7 @@ export interface SyncQueueItem {
 }
 
 export function getSyncQueueAction(item: SyncQueueItem) {
-  return item.action ?? item.accion ?? "UNKNOWN_ACTION";
+  return item.tipo_accion ?? item.action ?? item.accion ?? "UNKNOWN_ACTION";
 }
 
 export function getSyncQueueStatus(item: SyncQueueItem): QueueStatus {

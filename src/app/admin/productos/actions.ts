@@ -104,7 +104,7 @@ export async function createProductAction(formData: FormData): Promise<ProductAc
           fileSizeLimit: 5242880,
           allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"]
         });
-      } catch (e) {
+      } catch {
         // Ignorar si el bucket ya existe o no hay permisos de creación
       }
 
@@ -195,7 +195,7 @@ export async function updateProductAction(formData: FormData): Promise<ProductAc
           fileSizeLimit: 5242880,
           allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"]
         });
-      } catch (e) {
+      } catch {
         // Ignorar
       }
 

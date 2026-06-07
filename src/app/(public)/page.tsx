@@ -5,7 +5,6 @@ import {
   ArrowRight,
   DoorOpen,
   Hammer,
-  ImageIcon,
   Minus,
   PackageX,
   Plus,

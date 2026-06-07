@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type User } from "@supabase/supabase-js";
 import { UsuariosClient } from "./UsuariosClient";
 import type { Database } from "@/lib/supabase";
 
@@ -22,6 +22,9 @@ export default async function UsuariosPage() {
     );
   }
 
+  let users: User[] = [];
+  let initialError: string | null = null;
+
   try {
     // Instanciar cliente administrador para obtener la lista de usuarios de Auth
     const adminClient = createClient<Database>(supabaseUrl, serviceRoleKey, {
@@ -31,20 +34,14 @@ export default async function UsuariosPage() {
       }
     });
 
-    const { data: { users }, error } = await adminClient.auth.admin.listUsers();
+    const { data: { users: authUsers }, error } = await adminClient.auth.admin.listUsers();
 
-    const initialError = error ? `Error al cargar usuarios de Supabase: ${error.message}` : null;
-
-    return (
-      <UsuariosClient initialUsers={users || []} initialError={initialError} />
-    );
+    initialError = error ? `Error al cargar usuarios de Supabase: ${error.message}` : null;
+    users = authUsers || [];
   } catch (err) {
     console.error("[UsuariosPage] Error loading users:", err);
-    return (
-      <UsuariosClient 
-        initialUsers={[]} 
-        initialError={err instanceof Error ? err.message : "Error al conectar con la API de administración."} 
-      />
-    );
+    initialError = err instanceof Error ? err.message : "Error al conectar con la API de administración.";
   }
+
+  return <UsuariosClient initialUsers={users} initialError={initialError} />;
 }

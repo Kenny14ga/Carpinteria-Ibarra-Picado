@@ -1,6 +1,4 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
-import type { QueueStatus } from "@/lib/db";
 
 export type Json =
   | string
@@ -283,6 +281,20 @@ type ProcesarProduccionResult = {
   unidades_producidas: number;
 };
 
+type RecetaRpcResult = {
+  ok: boolean;
+  message: string;
+  costo_estimado?: number;
+  action?: "ARCHIVED" | "DELETED";
+};
+
+type ReporteFinancieroRpcResult = {
+  total_ingresos: number;
+  total_costos: number;
+  ganancia_neta: number;
+  numero_ventas: number;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -304,6 +316,38 @@ export type Database = {
           p_usuario_id: string;
         };
         Returns: ProcesarProduccionResult;
+      };
+      registrar_compra: {
+        Args: {
+          p_compra: Json;
+        };
+        Returns: Json;
+      };
+      actualizar_receta_completa: {
+        Args: {
+          p_id: string;
+          p_nombre: string;
+          p_producto_id: string | null;
+          p_rendimiento: number;
+          p_rendimiento_unidades: number;
+          p_estado: string;
+          p_instrucciones: string | null;
+          p_insumos: Json;
+        };
+        Returns: RecetaRpcResult;
+      };
+      eliminar_receta_segura: {
+        Args: {
+          p_receta_id: string;
+        };
+        Returns: RecetaRpcResult;
+      };
+      obtener_reporte_financiero: {
+        Args: {
+          p_fecha_inicio: string;
+          p_fecha_fin: string;
+        };
+        Returns: ReporteFinancieroRpcResult;
       };
     };
     Enums: Record<string, never>;

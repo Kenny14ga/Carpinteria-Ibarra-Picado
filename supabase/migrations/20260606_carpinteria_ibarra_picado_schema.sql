@@ -522,6 +522,140 @@ after insert or update or delete on public.receta_insumos
 for each row execute function public.recalcular_costo_receta_trigger();
 
 -- ────────────────────────────────────────────────────────────────────────────
+-- Funciones compatibles: fichas técnicas completas
+-- ────────────────────────────────────────────────────────────────────────────
+create or replace function public.actualizar_receta_completa(
+  p_id uuid,
+  p_nombre text,
+  p_producto_id uuid,
+  p_rendimiento numeric,
+  p_rendimiento_unidades numeric,
+  p_estado text,
+  p_instrucciones text,
+  p_insumos jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+declare
+  v_insumo jsonb;
+  v_material_id uuid;
+  v_cantidad numeric;
+  v_costo numeric;
+begin
+  if public.current_app_role() not in ('SUPERADMIN', 'EMPLEADO') then
+    raise exception 'No tiene permisos para actualizar fichas técnicas.';
+  end if;
+
+  if p_id is null then
+    raise exception 'El ID de la ficha es obligatorio.';
+  end if;
+
+  if nullif(trim(coalesce(p_nombre, '')), '') is null then
+    raise exception 'El nombre de la ficha es obligatorio.';
+  end if;
+
+  if coalesce(p_rendimiento, 0) <= 0 or coalesce(p_rendimiento_unidades, 0) <= 0 then
+    raise exception 'El rendimiento debe ser mayor que cero.';
+  end if;
+
+  update public.recetas
+     set nombre = trim(p_nombre),
+         producto_id = p_producto_id,
+         rendimiento = p_rendimiento,
+         rendimiento_unidades = p_rendimiento_unidades,
+         estado = coalesce(nullif(p_estado, ''), 'BORRADOR'),
+         instrucciones = nullif(trim(coalesce(p_instrucciones, '')), ''),
+         updated_at = now()
+   where id = p_id;
+
+  if not found then
+    raise exception 'La ficha técnica indicada no existe.';
+  end if;
+
+  delete from public.receta_insumos where receta_id = p_id;
+
+  if jsonb_typeof(coalesce(p_insumos, '[]'::jsonb)) <> 'array' then
+    raise exception 'Los materiales de la ficha deben enviarse como arreglo JSON.';
+  end if;
+
+  for v_insumo in
+    select value from jsonb_array_elements(coalesce(p_insumos, '[]'::jsonb))
+  loop
+    v_material_id := nullif(v_insumo ->> 'materia_prima_id', '')::uuid;
+    v_cantidad := coalesce((v_insumo ->> 'cantidad_insumo')::numeric, 0);
+
+    if v_material_id is not null and v_cantidad > 0 then
+      insert into public.receta_insumos (
+        receta_id, materia_prima_id, cantidad_insumo, created_at, updated_at
+      ) values (
+        p_id, v_material_id, v_cantidad, now(), now()
+      );
+    end if;
+  end loop;
+
+  v_costo := public.recalcular_costo_receta(p_id);
+
+  return jsonb_build_object(
+    'ok', true,
+    'message', 'Ficha técnica actualizada correctamente.',
+    'costo_estimado', v_costo
+  );
+end;
+$$;
+
+create or replace function public.eliminar_receta_segura(p_receta_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  if public.current_app_role() not in ('SUPERADMIN', 'EMPLEADO') then
+    raise exception 'No tiene permisos para eliminar fichas técnicas.';
+  end if;
+
+  if p_receta_id is null then
+    raise exception 'El ID de la ficha es obligatorio.';
+  end if;
+
+  if exists (select 1 from public.produccion_lotes where receta_id = p_receta_id) then
+    update public.recetas
+       set estado = 'ARCHIVADA',
+           updated_at = now()
+     where id = p_receta_id;
+
+    if not found then
+      raise exception 'La ficha técnica indicada no existe.';
+    end if;
+
+    return jsonb_build_object(
+      'ok', true,
+      'message', 'La ficha tenía historial de taller y fue archivada.',
+      'action', 'ARCHIVED'
+    );
+  end if;
+
+  delete from public.recetas where id = p_receta_id;
+
+  if not found then
+    raise exception 'La ficha técnica indicada no existe.';
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'message', 'Ficha técnica eliminada correctamente.',
+    'action', 'DELETED'
+  );
+end;
+$$;
+
+grant execute on function public.actualizar_receta_completa(uuid, text, uuid, numeric, numeric, text, text, jsonb) to authenticated;
+grant execute on function public.eliminar_receta_segura(uuid) to authenticated;
+
+-- ────────────────────────────────────────────────────────────────────────────
 -- Función: compra de materiales
 -- ────────────────────────────────────────────────────────────────────────────
 create or replace function public.registrar_compra(p_compra jsonb)
@@ -805,6 +939,56 @@ end;
 $$;
 
 grant execute on function public.procesar_produccion(uuid, integer, uuid) to authenticated;
+
+-- ────────────────────────────────────────────────────────────────────────────
+-- Función: reporte financiero básico
+-- ────────────────────────────────────────────────────────────────────────────
+create or replace function public.obtener_reporte_financiero(
+  p_fecha_inicio date,
+  p_fecha_fin date
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+declare
+  v_total_ingresos numeric;
+  v_total_costos numeric;
+  v_numero_ventas bigint;
+begin
+  if public.current_app_role() not in ('SUPERADMIN', 'EMPLEADO') then
+    raise exception 'No tiene permisos para consultar reportes financieros.';
+  end if;
+
+  if p_fecha_inicio is null or p_fecha_fin is null then
+    raise exception 'Debe enviar fecha de inicio y fecha de fin.';
+  end if;
+
+  select coalesce(sum(v.total), 0), count(*)
+    into v_total_ingresos, v_numero_ventas
+    from public.ventas v
+   where v.estado = 'COMPLETADA'
+     and v.created_at::date between p_fecha_inicio and p_fecha_fin;
+
+  select coalesce(sum(vd.cantidad * coalesce(p.costo_estimado, 0)), 0)
+    into v_total_costos
+    from public.venta_detalles vd
+    join public.ventas v on v.id = vd.venta_id
+    left join public.productos p on p.id = vd.producto_id
+   where v.estado = 'COMPLETADA'
+     and v.created_at::date between p_fecha_inicio and p_fecha_fin;
+
+  return jsonb_build_object(
+    'total_ingresos', v_total_ingresos,
+    'total_costos', v_total_costos,
+    'ganancia_neta', greatest(v_total_ingresos - v_total_costos, 0),
+    'numero_ventas', v_numero_ventas
+  );
+end;
+$$;
+
+grant execute on function public.obtener_reporte_financiero(date, date) to authenticated;
 
 -- ────────────────────────────────────────────────────────────────────────────
 -- Trigger POS offline: transacciones_sync CREATE_SALE

@@ -26,10 +26,6 @@ function getOnlineStatus() {
   return navigator.onLine;
 }
 
-function isSuccessfulStatus(status: number | null) {
-  return typeof status === "number" && status >= 200 && status < 300;
-}
-
 function serializePayload(payload: unknown): Json {
   try {
     return JSON.parse(JSON.stringify(payload ?? null)) as Json;
@@ -55,7 +51,7 @@ async function sendTransactionToSupabase(item: SyncQueueItem) {
   // Si en Dexie existe tipo_accion, se usa, de lo contrario se cae en action o accion.
   // La columna final en la base de datos es 'tipo_accion'.
   const payload = {
-    tipo_accion: (item as any).tipo_accion || item.action || item.accion || "UNKNOWN_ACTION",
+    tipo_accion: getSyncQueueAction(item),
     payload: serializePayload(item.payload),
     creado_en_cliente: new Date(item.timestamp).toISOString(),
     estado: getSyncQueueStatus(item)
@@ -146,7 +142,7 @@ export function useSyncEngine(): SyncEngineState {
           const message = describeError(error);
           console.error("❌ [Sync] Fallo al sincronizar transacción individual:", {
             queueId: item.id,
-            accion: (item as any).tipo_accion || item.action || item.accion || "UNKNOWN_ACTION",
+            accion: getSyncQueueAction(item),
             error
           });
 
